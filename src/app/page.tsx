@@ -21,7 +21,7 @@ export default function Home() {
             。
           </li>
           <li className="tracking-[-.01em]">
-            保存して変更を即座に確認できます。
+            保存して変更を即座に確認できます。2222
           </li>
         </ol>
 
