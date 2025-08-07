@@ -4,9 +4,10 @@ import Post from '@/lib/models/Post';
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await dbConnect();
     const { content } = await request.json();
 
@@ -19,7 +20,7 @@ export async function PUT(
     }
 
     const post = await Post.findByIdAndUpdate(
-      params.id,
+      id,
       { content: content.trim() },
       { new: true, runValidators: true }
     );
@@ -36,12 +37,13 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await dbConnect();
     
-    const post = await Post.findByIdAndDelete(params.id);
+    const post = await Post.findByIdAndDelete(id);
 
     if (!post) {
       return NextResponse.json({ error: '投稿が見つかりません' }, { status: 404 });
