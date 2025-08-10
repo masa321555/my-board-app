@@ -98,16 +98,22 @@ export default function PostForm({ editingPost, onSubmit, onCancel }: PostFormPr
               fullWidth
               placeholder="何を投稿しますか？（200文字以内）"
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={(e) => {
+                // 200文字を超える入力を防ぐ
+                if (e.target.value.length <= 200) {
+                  setContent(e.target.value);
+                }
+              }}
               error={isOverLimit}
               sx={{ mb: 0.5 }}
+              inputProps={{ maxLength: 200 }}
             />
             <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 1.75, mt: 0.5 }}>
               <Typography variant="caption" color={isOverLimit ? 'error' : 'text.secondary'}>
                 {isOverLimit ? '文字数が上限を超えています' : ''}
               </Typography>
               <Typography variant="caption" color={isOverLimit ? 'error' : 'text.secondary'}>
-                {remainingChars}文字
+                {content.length}/200文字
               </Typography>
             </Box>
           </Box>
