@@ -92,5 +92,13 @@
   "resolutions": {
     "@auth/core": "0.34.2",
     "nodemailer": "6.10.1"
+  },
+  "peerDependenciesMeta": {
+    "@auth/core": {
+      "optional": true
+    },
+    "nodemailer": {
+      "optional": true
+    }
   }
 }
