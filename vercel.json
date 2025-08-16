@@ -24,9 +24,9 @@
   },
   "build": {
     "env": {
-      "NPM_FLAGS": "--legacy-peer-deps"
+      "NPM_FLAGS": "--legacy-peer-deps --force"
     }
   },
-  "installCommand": "npm install --legacy-peer-deps",
-  "buildCommand": "npm run build"
+  "installCommand": "npm install --legacy-peer-deps --force",
+  "buildCommand": "npm run build:vercel"
 }

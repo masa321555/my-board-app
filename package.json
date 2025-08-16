@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:vercel": "npm install --legacy-peer-deps --force && next build",
     "build:production": "NODE_ENV=production next build",
     "start": "next start",
     "start:production": "NODE_ENV=production next start",
@@ -85,6 +86,11 @@
     "typescript": "^5"
   },
   "overrides": {
-    "@auth/core": "0.34.2"
+    "@auth/core": "0.34.2",
+    "nodemailer": "6.10.1"
+  },
+  "resolutions": {
+    "@auth/core": "0.34.2",
+    "nodemailer": "6.10.1"
   }
 }
