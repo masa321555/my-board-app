@@ -1,6 +1,6 @@
 'use client';
 
-import * as Sentry from '@sentry/nextjs';
+// import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
 import { Button } from '@mui/material';
 import { useRouter } from 'next/navigation';
@@ -15,15 +15,16 @@ export default function GlobalError({
   const router = useRouter();
 
   useEffect(() => {
-    // Sentryにエラーを送信
-    Sentry.captureException(error, {
-      tags: {
-        location: 'global-error',
-      },
-      extra: {
-        digest: error.digest,
-      },
-    });
+    // Sentryにエラーを送信（Sentry設定後に有効化）
+    // Sentry.captureException(error, {
+    //   tags: {
+    //     location: 'global-error',
+    //   },
+    //   extra: {
+    //     digest: error.digest,
+    //   },
+    // });
+    console.error('Global error:', error);
   }, [error]);
 
   return (

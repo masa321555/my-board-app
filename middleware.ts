@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { applySecurityHeaders } from '@/lib/security-headers';
 import { checkRateLimit } from '@/lib/rate-limiter';
-import { logRateLimitExceeded, logUnauthorizedAccess } from '@/lib/audit-logger';
+// import { logRateLimitExceeded, logUnauthorizedAccess } from '@/lib/audit-logger';
 
 export default withAuth(
   async function middleware(req) {
@@ -16,8 +16,8 @@ export default withAuth(
       const rateLimitResult = await checkRateLimit(req, rateLimitKey);
       
       if (!rateLimitResult.allowed) {
-        // レート制限超過をログに記録
-        await logRateLimitExceeded(token?.id as string | undefined, pathname, req);
+        // レート制限超過をログに記録（Edge Runtimeでは無効）
+        // await logRateLimitExceeded(token?.id as string | undefined, pathname, req);
         
         return NextResponse.json(
           { error: 'リクエストが多すぎます。しばらくお待ちください。' },
@@ -49,8 +49,8 @@ export default withAuth(
     
     // 管理者エリアのアクセス制限
     if (pathname.startsWith('/admin') && token?.role !== 'admin') {
-      // 不正アクセスをログに記録
-      await logUnauthorizedAccess(token?.id as string | undefined, '/admin', req);
+      // 不正アクセスをログに記録（Edge Runtimeでは無効）
+      // await logUnauthorizedAccess(token?.id as string | undefined, '/admin', req);
       return NextResponse.redirect(new URL('/unauthorized', req.url));
     }
     
