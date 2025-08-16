@@ -1,20 +1,25 @@
 {
-  "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "installCommand": "npm install --production=false",
-  "regions": ["hnd1"],
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "env": {
+    "NEXTAUTH_URL": "@nextauth_url",
+    "NEXTAUTH_SECRET": "@nextauth_secret",
+    "MONGODB_URI": "@mongodb_uri",
+    "AWS_REGION": "@aws_region",
+    "AWS_ACCESS_KEY_ID": "@aws_access_key_id",
+    "AWS_SECRET_ACCESS_KEY": "@aws_secret_access_key",
+    "S3_BUCKET_NAME": "@s3_bucket_name",
+    "SENDGRID_API_KEY": "@sendgrid_api_key",
+    "SENDGRID_FROM_EMAIL": "@sendgrid_from_email"
+  },
   "functions": {
-    "app/api/posts/route.ts": {
-      "maxDuration": 10
-    },
-    "app/api/posts/[id]/route.ts": {
-      "maxDuration": 10
-    },
-    "app/api/user/avatar/route.ts": {
+    "app/api/**/*.ts": {
       "maxDuration": 30
-    },
-    "app/api/auth/[...nextauth]/route.ts": {
-      "maxDuration": 10
     }
   }
 }
