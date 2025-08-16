@@ -233,17 +233,21 @@ export default function RegisterForm() {
       </Typography>
       
       <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3 }}>
-        {serverError && (
-          <Alert severity="error" sx={{ mb: 2 }} key={`error-${dynamicKey}`}>
-            {serverError}
-          </Alert>
-        )}
+        <Alert 
+          severity="error" 
+          sx={{ mb: 2, display: serverError ? 'flex' : 'none' }} 
+          key={`error-${dynamicKey}`}
+        >
+          {serverError}
+        </Alert>
         
-        {successMessage && (
-          <Alert severity="success" sx={{ mb: 2 }} key={`success-${dynamicKey}`}>
-            {successMessage}
-          </Alert>
-        )}
+        <Alert 
+          severity="success" 
+          sx={{ mb: 2, display: successMessage ? 'flex' : 'none' }} 
+          key={`success-${dynamicKey}`}
+        >
+          {successMessage}
+        </Alert>
         
         <TextField
           {...register('name')}

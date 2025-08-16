@@ -368,11 +368,13 @@ export default function BoardPage() {
         </Box>
       </Box>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }} key={`error-${dynamicKey}`}>
-          {error}
-        </Alert>
-      )}
+      <Alert 
+        severity="error" 
+        sx={{ mb: 2, display: error ? 'flex' : 'none' }} 
+        key={`error-${dynamicKey}`}
+      >
+        {error}
+      </Alert>
 
       {posts.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: 'center' }}>
@@ -462,11 +464,13 @@ export default function BoardPage() {
           <Typography>
             この操作は取り消すことができません。本当に削除してもよろしいですか？
           </Typography>
-          {error && (
-            <Alert severity="error" sx={{ mt: 2 }} key={`dialog-error-${dynamicKey}`}>
-              {error}
-            </Alert>
-          )}
+          <Alert 
+            severity="error" 
+            sx={{ mt: 2, display: error ? 'flex' : 'none' }} 
+            key={`dialog-error-${dynamicKey}`}
+          >
+            {error}
+          </Alert>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteCancel} disabled={isDeleting}>

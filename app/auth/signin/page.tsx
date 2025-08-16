@@ -37,7 +37,65 @@ function SignInContent() {
 
   // マウント状態の管理
   useEffect(() => {
-    mountedRef.current = true;
+    mountedRef.current = true;[01:09:43.438] Running build in Washington, D.C., USA (East) – iad1
+[01:09:43.439] Build machine configuration: 4 cores, 8 GB
+[01:09:43.460] Cloning github.com/masa321555/my-board-app (Branch: main, Commit: 96065d8)
+[01:09:43.573] Previous build caches not available
+[01:09:43.739] Cloning completed: 279.000ms
+[01:09:45.885] Running "vercel build"
+[01:09:46.340] Vercel CLI 45.0.10
+[01:09:47.022] Running "install" command: `npm install --production=false`...
+[01:09:47.315] npm warn config production Use `--omit=dev` instead.
+[01:09:48.387] npm warn ERESOLVE overriding peer dependency
+[01:09:48.388] npm warn While resolving: @auth/core@0.40.0
+[01:09:48.388] npm warn Found: nodemailer@7.0.5
+[01:09:48.388] npm warn node_modules/nodemailer
+[01:09:48.388] npm warn   nodemailer@"^7.0.5" from the root project
+[01:09:48.388] npm warn
+[01:09:48.388] npm warn Could not resolve dependency:
+[01:09:48.388] npm warn peerOptional nodemailer@"^6.8.0" from @auth/core@0.40.0
+[01:09:48.389] npm warn node_modules/@auth/core
+[01:09:48.389] npm warn   @auth/core@"0.40.0" from @auth/mongodb-adapter@3.10.0
+[01:09:48.389] npm warn   node_modules/@auth/mongodb-adapter
+[01:09:48.389] npm warn
+[01:09:48.389] npm warn Conflicting peer dependency: nodemailer@6.10.1
+[01:09:48.389] npm warn node_modules/nodemailer
+[01:09:48.389] npm warn   peerOptional nodemailer@"^6.8.0" from @auth/core@0.40.0
+[01:09:48.389] npm warn   node_modules/@auth/core
+[01:09:48.389] npm warn     @auth/core@"0.40.0" from @auth/mongodb-adapter@3.10.0
+[01:09:48.389] npm warn     node_modules/@auth/mongodb-adapter
+[01:09:49.466] npm error code ERESOLVE
+[01:09:49.466] npm error ERESOLVE could not resolve
+[01:09:49.466] npm error
+[01:09:49.466] npm error While resolving: next-auth@4.24.11
+[01:09:49.466] npm error Found: @auth/core@0.40.0
+[01:09:49.466] npm error node_modules/@auth/core
+[01:09:49.467] npm error   @auth/core@"0.40.0" from @auth/mongodb-adapter@3.10.0
+[01:09:49.467] npm error   node_modules/@auth/mongodb-adapter
+[01:09:49.467] npm error     @auth/mongodb-adapter@"^3.10.0" from the root project
+[01:09:49.467] npm error
+[01:09:49.467] npm error Could not resolve dependency:
+[01:09:49.467] npm error peerOptional @auth/core@"0.34.2" from next-auth@4.24.11
+[01:09:49.467] npm error node_modules/next-auth
+[01:09:49.467] npm error   next-auth@"^4.24.11" from the root project
+[01:09:49.467] npm error
+[01:09:49.467] npm error Conflicting peer dependency: nodemailer@6.10.1
+[01:09:49.467] npm error node_modules/nodemailer
+[01:09:49.467] npm error   peerOptional nodemailer@"^6.8.0" from @auth/core@0.34.2
+[01:09:49.467] npm error   node_modules/@auth/core
+[01:09:49.467] npm error     peerOptional @auth/core@"0.34.2" from next-auth@4.24.11
+[01:09:49.467] npm error     node_modules/next-auth
+[01:09:49.468] npm error       next-auth@"^4.24.11" from the root project
+[01:09:49.468] npm error
+[01:09:49.468] npm error Fix the upstream dependency conflict, or retry
+[01:09:49.468] npm error this command with --force or --legacy-peer-deps
+[01:09:49.468] npm error to accept an incorrect (and potentially broken) dependency resolution.
+[01:09:49.468] npm error
+[01:09:49.468] npm error
+[01:09:49.468] npm error For a full report see:
+[01:09:49.468] npm error /vercel/.npm/_logs/2025-08-16T16_09_47_272Z-eresolve-report.txt
+[01:09:49.468] npm error A complete log of this run can be found in: /vercel/.npm/_logs/2025-08-16T16_09_47_272Z-debug-0.log
+[01:09:49.507] Error: Command "npm install --production=false" exited with 1
     setMounted(true);
     
     return () => {
@@ -182,11 +240,13 @@ function SignInContent() {
           </Typography>
           
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            {error && (
-              <Alert severity="error" sx={{ mb: 2 }} key={`error-${dynamicKey}`}>
-                {error}
-              </Alert>
-            )}
+            <Alert 
+              severity="error" 
+              sx={{ mb: 2, display: error ? 'flex' : 'none' }} 
+              key={`error-${dynamicKey}`}
+            >
+              {error}
+            </Alert>
             
             <TextField
               margin="normal"

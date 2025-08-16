@@ -161,17 +161,21 @@ export default function ForgotPasswordPage() {
           </Typography>
           
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            {error && (
-              <Alert severity="error" sx={{ mb: 2 }} key={`error-${dynamicKey}`}>
-                {error}
-              </Alert>
-            )}
+            <Alert 
+              severity="error" 
+              sx={{ mb: 2, display: error ? 'flex' : 'none' }} 
+              key={`error-${dynamicKey}`}
+            >
+              {error}
+            </Alert>
             
-            {success && (
-              <Alert severity="success" sx={{ mb: 2 }} key={`success-${dynamicKey}`}>
-                {success}
-              </Alert>
-            )}
+            <Alert 
+              severity="success" 
+              sx={{ mb: 2, display: success ? 'flex' : 'none' }} 
+              key={`success-${dynamicKey}`}
+            >
+              {success}
+            </Alert>
             
             <TextField
               margin="normal"

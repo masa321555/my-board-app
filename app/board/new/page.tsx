@@ -172,11 +172,13 @@ export default function NewPostPage() {
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }} key={`error-${dynamicKey}`}>
-              {error}
-            </Alert>
-          )}
+          <Alert 
+            severity="error" 
+            sx={{ mb: 2, display: error ? 'flex' : 'none' }} 
+            key={`error-${dynamicKey}`}
+          >
+            {error}
+          </Alert>
 
           <TextField
             fullWidth
