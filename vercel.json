@@ -17,11 +17,6 @@
     "SENDGRID_API_KEY": "@sendgrid_api_key",
     "SENDGRID_FROM_EMAIL": "@sendgrid_from_email"
   },
-  "functions": {
-    "app/api/**/*.ts": {
-      "maxDuration": 30
-    }
-  },
   "build": {
     "env": {
       "NPM_FLAGS": "--legacy-peer-deps --force"
