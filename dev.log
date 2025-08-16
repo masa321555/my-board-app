@@ -9,13 +9,18 @@
    ▲ Next.js 15.4.5 (Turbopack)
    - Local:        http://localhost:3000
    - Network:      http://192.168.68.52:3000
-   - Environments: .env.local
+   - Environments: .env.local, .env
 
  ✓ Starting...
- ✓ Ready in 1448ms
- ○ Compiling /test ...
- ✓ Compiled /test in 3.7s
- GET /test 200 in 4359ms
+ ✓ Compiled middleware in 384ms
+ ✓ Ready in 1823ms
  ○ Compiling / ...
- ✓ Compiled / in 639ms
- GET / 200 in 800ms
+ ✓ Compiled / in 4.5s
+ HEAD / 200 in 5121ms
+ GET / 200 in 144ms
+ ○ Compiling /api/posts ...
+ ✓ Compiled /api/posts in 1136ms
+ GET /api/auth/session 404 in 1273ms
+ GET /api/auth/session 404 in 102ms
+ GET /api/posts 200 in 1764ms
+[?25h

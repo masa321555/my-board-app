@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ThemeRegistry from './ThemeRegistry';
+import Providers from '@/components/Providers';
+import Header from '@/components/Header';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,7 +40,10 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ThemeRegistry>
-          {children}
+          <Providers>
+            <Header />
+            {children}
+          </Providers>
         </ThemeRegistry>
       </body>
     </html>
