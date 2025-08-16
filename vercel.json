@@ -6,17 +6,6 @@
       "use": "@vercel/next"
     }
   ],
-  "env": {
-    "NEXTAUTH_URL": "@nextauth_url",
-    "NEXTAUTH_SECRET": "@nextauth_secret",
-    "MONGODB_URI": "@mongodb_uri",
-    "AWS_REGION": "@aws_region",
-    "AWS_ACCESS_KEY_ID": "@aws_access_key_id",
-    "AWS_SECRET_ACCESS_KEY": "@aws_secret_access_key",
-    "S3_BUCKET_NAME": "@s3_bucket_name",
-    "SENDGRID_API_KEY": "@sendgrid_api_key",
-    "SENDGRID_FROM_EMAIL": "@sendgrid_from_email"
-  },
   "build": {
     "env": {
       "NPM_FLAGS": "--legacy-peer-deps --force"
