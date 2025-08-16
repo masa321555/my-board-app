@@ -85,6 +85,11 @@
     "typescript": "^5"
   },
   "overrides": {
-    "@auth/core": "0.34.2"
+    "@auth/core": "0.34.2",
+    "nodemailer": "6.10.1"
+  },
+  "resolutions": {
+    "@auth/core": "0.34.2",
+    "nodemailer": "6.10.1"
   }
 }
