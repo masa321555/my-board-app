@@ -20,8 +20,23 @@ export async function POST(request: NextRequest) {
     }
 
     // トークンを検証
-    const decoded = TokenUtils.verifyEmailConfirmationToken(token);
-    
+    let decoded;
+    try {
+      decoded = TokenUtils.verifyToken(token);
+      if (decoded.type !== 'email-confirmation') {
+        throw new Error('Invalid token type');
+      }
+    } catch (error) {
+      return NextResponse.json(
+        { 
+          success: false,
+          error: '無効または期限切れのトークンです',
+          message: 'メール確認リンクが無効または期限切れです。新規登録からやり直してください。'
+        },
+        { status: 400 }
+      );
+    }
+
     if (!decoded) {
       return NextResponse.json(
         { 
@@ -39,7 +54,6 @@ export async function POST(request: NextRequest) {
     const user = await User.findOne({
       _id: decoded.userId,
       email: decoded.email,
-      emailVerificationToken: token,
     });
 
     if (!user) {
