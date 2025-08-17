@@ -273,17 +273,19 @@ function RegisterContent() {
           </Typography>
           
           <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3 }}>
-            {serverError && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {serverError}
-              </Alert>
-            )}
+            <Alert 
+              severity="error" 
+              sx={{ mb: 2, display: serverError ? 'flex' : 'none' }}
+            >
+              {serverError}
+            </Alert>
             
-            {successMessage && (
-              <Alert severity="success" sx={{ mb: 2 }}>
-                {successMessage}
-              </Alert>
-            )}
+            <Alert 
+              severity="success" 
+              sx={{ mb: 2, display: successMessage ? 'flex' : 'none' }}
+            >
+              {successMessage}
+            </Alert>
             
             <TextField
               margin="normal"
