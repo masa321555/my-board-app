@@ -37,10 +37,19 @@ export default withAuth(
     const isDevelopment = process.env.NODE_ENV === 'development';
     
     // メール未確認ユーザーのアクセス制限（本番環境のみ）
-    if (!isDevelopment && !token?.emailVerified) {
+    if (!isDevelopment && token && !token.emailVerified) {
       // 特定のパスはメール確認不要
-      const emailVerificationExemptPaths = ['/auth/', '/api/auth/'];
-      const isExempt = emailVerificationExemptPaths.some(path => pathname.startsWith(path));
+      const emailVerificationExemptPaths = [
+        '/',
+        '/auth/',
+        '/api/auth/',
+        '/public/',
+        '/_next/',
+        '/favicon.ico'
+      ];
+      const isExempt = emailVerificationExemptPaths.some(path => 
+        pathname === path || pathname.startsWith(path)
+      );
       
       if (!isExempt) {
         return NextResponse.redirect(new URL('/auth/verify-email', req.url));
