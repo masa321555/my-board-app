@@ -107,7 +107,8 @@ export default function RegisterForm() {
     console.log('フォーム送信開始:', { 
       name: data.name, 
       email: data.email, 
-      passwordLength: data.password?.length 
+      passwordLength: data.password?.length,
+      confirmPasswordLength: data.confirmPassword?.length
     });
     
     safeSetState(() => {
@@ -122,6 +123,7 @@ export default function RegisterForm() {
         name: data.name,
         email: data.email,
         password: data.password,
+        confirmPassword: data.confirmPassword, // 明示的に追加
       };
       
       console.log('APIリクエスト送信:', requestBody);
@@ -188,7 +190,9 @@ export default function RegisterForm() {
               } catch (fallbackError) {
                 console.error('Fallback navigation error:', fallbackError);
                 // 最後の手段としてwindow.locationを使用
-                window.location.href = '/auth/signin';
+                if (mountedRef.current) {
+                  window.location.href = '/auth/signin';
+                }
               }
             }
           }

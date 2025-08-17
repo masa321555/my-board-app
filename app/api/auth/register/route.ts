@@ -112,11 +112,12 @@ export async function POST(request: NextRequest) {
     console.error('登録エラーの詳細:', error);
     
     if (error instanceof z.ZodError) {
-      console.log('バリデーションエラー詳細:', (error as any).errors);
+      const zodError = error as any;
+      console.log('バリデーションエラー詳細:', zodError.errors);
       return NextResponse.json(
         { 
           error: 'バリデーションエラー', 
-          details: (error as any).errors.map((err: any) => ({
+          details: zodError.errors.map((err: any) => ({
             field: err.path.join('.'),
             message: err.message
           }))

@@ -27,8 +27,16 @@ export const registerSchema = z.object({
     }, 'パスワードが弱すぎます。8文字以上で、より強力なパスワードを設定してください'),
   confirmPassword: z
     .string()
-    .min(1, 'パスワード（確認）を入力してください'),
-}).refine((data) => data.password === data.confirmPassword, {
+    .min(1, 'パスワード（確認）を入力してください')
+    .optional(), // 開発環境ではオプショナルに
+}).refine((data) => {
+  // 開発環境ではパスワード確認をスキップ
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  if (isDevelopment) {
+    return true;
+  }
+  return data.password === data.confirmPassword;
+}, {
   message: 'パスワードが一致しません',
   path: ['confirmPassword'],
 });
