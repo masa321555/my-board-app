@@ -48,14 +48,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // トークンの有効期限をチェック
-    if (user.emailVerificationExpires && user.emailVerificationExpires < new Date()) {
-      return NextResponse.json(
-        { error: '確認トークンの有効期限が切れています' },
-        { status: 400 }
-      );
-    }
-
     // 既に確認済みの場合
     if (user.emailVerified) {
       // サクセスページにリダイレクト

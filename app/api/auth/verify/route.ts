@@ -53,18 +53,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // トークンの有効期限をチェック
-    if (user.emailVerificationExpires && user.emailVerificationExpires < new Date()) {
-      return NextResponse.json(
-        { 
-          success: false,
-          error: '確認トークンの有効期限が切れています',
-          message: 'メール確認の有効期限（24時間）が切れています。ログイン後、確認メールを再送信してください。'
-        },
-        { status: 400 }
-      );
-    }
-
     // 既に確認済みの場合
     if (user.emailVerified) {
       return NextResponse.json({
@@ -77,7 +65,6 @@ export async function POST(request: NextRequest) {
     // メールアドレスを確認済みに更新
     user.emailVerified = true;
     user.emailVerificationToken = undefined;
-    user.emailVerificationExpires = undefined;
     await user.save();
 
     // ウェルカムメールを送信（本番環境のみ）

@@ -4138,3 +4138,392 @@ Error: Route "/api/user/dashboard" used `cookies().getAll()`. `cookies()` should
 [Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
 [Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
  GET /api/auth/session 200 in 359ms
+ GET /auth/signin 200 in 249ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/session 200 in 713ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/session 200 in 454ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/providers 200 in 922ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/csrf 200 in 823ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+認証開始: masaharu3210101@yahoo.co.jp
+ユーザーが見つかりました: masaharu3210101@yahoo.co.jp マサハル
+パスワード検証開始
+入力パスワード: zxcvbnm321
+ハッシュパスワード: $2b$12$Lss0QvEDMxZVSQBu3paVf.HjqLlFB/0bhaVFy/hKbA1zuHxqSnWHS
+パスワード検証結果: true
+認証成功: masaharu3210101@yahoo.co.jp
+ POST /api/auth/callback/credentials 200 in 1657ms
+ GET /board 200 in 1032ms
+ GET /dashboard 200 in 151ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/session 200 in 341ms
+Error: Route "/api/user/dashboard" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/dashboard/route.ts:9:43)
+   7 | export async function GET(_request: NextRequest) {
+   8 |   try {
+>  9 |     const session = await getServerSession(authOptions);
+     |                                           ^
+  10 |     
+  11 |     if (!session?.user?.id) {
+  12 |       return NextResponse.json(
+Error: Route "/api/user/dashboard" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/dashboard/route.ts:9:43)
+   7 | export async function GET(_request: NextRequest) {
+   8 |   try {
+>  9 |     const session = await getServerSession(authOptions);
+     |                                           ^
+  10 |     
+  11 |     if (!session?.user?.id) {
+  12 |       return NextResponse.json(
+ GET /api/user/dashboard 200 in 647ms
+ GET /board 200 in 395ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/session 200 in 360ms
+Error: Route "/api/posts" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/posts/route.ts:17:43)
+  15 | export async function GET(request: NextRequest) {
+  16 |   try {
+> 17 |     const session = await getServerSession(authOptions);
+     |                                           ^
+  18 |     
+  19 |     if (!session?.user) {
+  20 |       return NextResponse.json(
+Error: Route "/api/posts" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/posts/route.ts:17:43)
+  15 | export async function GET(request: NextRequest) {
+  16 |   try {
+> 17 |     const session = await getServerSession(authOptions);
+     |                                           ^
+  18 |     
+  19 |     if (!session?.user) {
+  20 |       return NextResponse.json(
+ GET /api/posts?page=1&limit=10 200 in 317ms
+ GET /dashboard 200 in 232ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/session 200 in 385ms
+Error: Route "/api/user/dashboard" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/dashboard/route.ts:9:43)
+   7 | export async function GET(_request: NextRequest) {
+   8 |   try {
+>  9 |     const session = await getServerSession(authOptions);
+     |                                           ^
+  10 |     
+  11 |     if (!session?.user?.id) {
+  12 |       return NextResponse.json(
+Error: Route "/api/user/dashboard" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/dashboard/route.ts:9:43)
+   7 | export async function GET(_request: NextRequest) {
+   8 |   try {
+>  9 |     const session = await getServerSession(authOptions);
+     |                                           ^
+  10 |     
+  11 |     if (!session?.user?.id) {
+  12 |       return NextResponse.json(
+ GET /api/user/dashboard 200 in 391ms
+ GET /board 200 in 231ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/session 200 in 384ms
+Error: Route "/api/posts" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/posts/route.ts:17:43)
+  15 | export async function GET(request: NextRequest) {
+  16 |   try {
+> 17 |     const session = await getServerSession(authOptions);
+     |                                           ^
+  18 |     
+  19 |     if (!session?.user) {
+  20 |       return NextResponse.json(
+Error: Route "/api/posts" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/posts/route.ts:17:43)
+  15 | export async function GET(request: NextRequest) {
+  16 |   try {
+> 17 |     const session = await getServerSession(authOptions);
+     |                                           ^
+  18 |     
+  19 |     if (!session?.user) {
+  20 |       return NextResponse.json(
+ GET /api/posts?page=1&limit=10 200 in 331ms
+ GET /dashboard 200 in 221ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/session 200 in 325ms
+Error: Route "/api/user/dashboard" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/dashboard/route.ts:9:43)
+   7 | export async function GET(_request: NextRequest) {
+   8 |   try {
+>  9 |     const session = await getServerSession(authOptions);
+     |                                           ^
+  10 |     
+  11 |     if (!session?.user?.id) {
+  12 |       return NextResponse.json(
+Error: Route "/api/user/dashboard" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/dashboard/route.ts:9:43)
+   7 | export async function GET(_request: NextRequest) {
+   8 |   try {
+>  9 |     const session = await getServerSession(authOptions);
+     |                                           ^
+  10 |     
+  11 |     if (!session?.user?.id) {
+  12 |       return NextResponse.json(
+ GET /api/user/dashboard 200 in 377ms
+ GET / 200 in 222ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/session 200 in 312ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/csrf 200 in 321ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ POST /api/auth/signout 200 in 540ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/session 200 in 352ms
+ GET /auth/signin 200 in 144ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/providers 200 in 308ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/csrf 200 in 371ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+認証開始: masaharu3210101@yahoo.co.jp
+ユーザーが見つかりました: masaharu3210101@yahoo.co.jp マサハル
+パスワード検証開始
+入力パスワード: zxcvbnm321
+ハッシュパスワード: $2b$12$Lss0QvEDMxZVSQBu3paVf.HjqLlFB/0bhaVFy/hKbA1zuHxqSnWHS
+パスワード検証結果: true
+認証成功: masaharu3210101@yahoo.co.jp
+ POST /api/auth/callback/credentials 200 in 1007ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/session 200 in 318ms
+ GET /dashboard 200 in 98ms
+Error: Route "/api/user/dashboard" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/dashboard/route.ts:9:43)
+   7 | export async function GET(_request: NextRequest) {
+   8 |   try {
+>  9 |     const session = await getServerSession(authOptions);
+     |                                           ^
+  10 |     
+  11 |     if (!session?.user?.id) {
+  12 |       return NextResponse.json(
+Error: Route "/api/user/dashboard" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/dashboard/route.ts:9:43)
+   7 | export async function GET(_request: NextRequest) {
+   8 |   try {
+>  9 |     const session = await getServerSession(authOptions);
+     |                                           ^
+  10 |     
+  11 |     if (!session?.user?.id) {
+  12 |       return NextResponse.json(
+ GET /api/user/dashboard 200 in 381ms
+ GET /profile 200 in 274ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/session 200 in 367ms
+Auth error: TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function
+    at GET (app/api/user/profile/route.ts:13:25)
+  11 |     let session;
+  12 |     try {
+> 13 |       session = await auth();
+     |                         ^
+  14 |     } catch (authError) {
+  15 |       console.error('Auth error:', authError);
+  16 |       // フォールバック: getServerSessionを使用
+(node:27035) [MONGOOSE] Warning: Duplicate schema index on {"email":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+Error: Route "/api/user/profile" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/profile/route.ts:18:39)
+  16 |       // フォールバック: getServerSessionを使用
+  17 |       const { authOptions } = await import('@/lib/auth-options');
+> 18 |       session = await getServerSession(authOptions);
+     |                                       ^
+  19 |     }
+  20 |     
+  21 |     if (!session?.user?.id) {
+Error: Route "/api/user/profile" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/profile/route.ts:18:39)
+  16 |       // フォールバック: getServerSessionを使用
+  17 |       const { authOptions } = await import('@/lib/auth-options');
+> 18 |       session = await getServerSession(authOptions);
+     |                                       ^
+  19 |     }
+  20 |     
+  21 |     if (!session?.user?.id) {
+ GET /api/user/profile 200 in 867ms
+Auth error: TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function
+    at PUT (app/api/user/profile/route.ts:65:25)
+  63 |     let session;
+  64 |     try {
+> 65 |       session = await auth();
+     |                         ^
+  66 |     } catch (authError) {
+  67 |       console.error('Auth error:', authError);
+  68 |       // フォールバック: getServerSessionを使用
+Error: Route "/api/user/profile" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at PUT (app/api/user/profile/route.ts:70:39)
+  68 |       // フォールバック: getServerSessionを使用
+  69 |       const { authOptions } = await import('@/lib/auth-options');
+> 70 |       session = await getServerSession(authOptions);
+     |                                       ^
+  71 |     }
+  72 |     
+  73 |     if (!session?.user?.id) {
+Error: Route "/api/user/profile" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at PUT (app/api/user/profile/route.ts:70:39)
+  68 |       // フォールバック: getServerSessionを使用
+  69 |       const { authOptions } = await import('@/lib/auth-options');
+> 70 |       session = await getServerSession(authOptions);
+     |                                       ^
+  71 |     }
+  72 |     
+  73 |     if (!session?.user?.id) {
+ PUT /api/user/profile 200 in 449ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/csrf 200 in 287ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ POST /api/auth/session 200 in 400ms
+Auth error: TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function
+    at GET (app/api/user/profile/route.ts:13:25)
+  11 |     let session;
+  12 |     try {
+> 13 |       session = await auth();
+     |                         ^
+  14 |     } catch (authError) {
+  15 |       console.error('Auth error:', authError);
+  16 |       // フォールバック: getServerSessionを使用
+Error: Route "/api/user/profile" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/profile/route.ts:18:39)
+  16 |       // フォールバック: getServerSessionを使用
+  17 |       const { authOptions } = await import('@/lib/auth-options');
+> 18 |       session = await getServerSession(authOptions);
+     |                                       ^
+  19 |     }
+  20 |     
+  21 |     if (!session?.user?.id) {
+Error: Route "/api/user/profile" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/profile/route.ts:18:39)
+  16 |       // フォールバック: getServerSessionを使用
+  17 |       const { authOptions } = await import('@/lib/auth-options');
+> 18 |       session = await getServerSession(authOptions);
+     |                                       ^
+  19 |     }
+  20 |     
+  21 |     if (!session?.user?.id) {
+ GET /api/user/profile 200 in 521ms
+ GET /dashboard 200 in 200ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/session 200 in 311ms
+Error: Route "/api/user/dashboard" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/dashboard/route.ts:9:43)
+   7 | export async function GET(_request: NextRequest) {
+   8 |   try {
+>  9 |     const session = await getServerSession(authOptions);
+     |                                           ^
+  10 |     
+  11 |     if (!session?.user?.id) {
+  12 |       return NextResponse.json(
+Error: Route "/api/user/dashboard" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/dashboard/route.ts:9:43)
+   7 | export async function GET(_request: NextRequest) {
+   8 |   try {
+>  9 |     const session = await getServerSession(authOptions);
+     |                                           ^
+  10 |     
+  11 |     if (!session?.user?.id) {
+  12 |       return NextResponse.json(
+ GET /api/user/dashboard 200 in 317ms
+ GET /dashboard 200 in 178ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/session 200 in 333ms
+Error: Route "/api/user/dashboard" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/dashboard/route.ts:9:43)
+   7 | export async function GET(_request: NextRequest) {
+   8 |   try {
+>  9 |     const session = await getServerSession(authOptions);
+     |                                           ^
+  10 |     
+  11 |     if (!session?.user?.id) {
+  12 |       return NextResponse.json(
+Error: Route "/api/user/dashboard" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/dashboard/route.ts:9:43)
+   7 | export async function GET(_request: NextRequest) {
+   8 |   try {
+>  9 |     const session = await getServerSession(authOptions);
+     |                                           ^
+  10 |     
+  11 |     if (!session?.user?.id) {
+  12 |       return NextResponse.json(
+ GET /api/user/dashboard 200 in 343ms
+ GET /profile 200 in 189ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/session 200 in 329ms
+Auth error: TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function
+    at GET (app/api/user/profile/route.ts:13:25)
+  11 |     let session;
+  12 |     try {
+> 13 |       session = await auth();
+     |                         ^
+  14 |     } catch (authError) {
+  15 |       console.error('Auth error:', authError);
+  16 |       // フォールバック: getServerSessionを使用
+Error: Route "/api/user/profile" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/profile/route.ts:18:39)
+  16 |       // フォールバック: getServerSessionを使用
+  17 |       const { authOptions } = await import('@/lib/auth-options');
+> 18 |       session = await getServerSession(authOptions);
+     |                                       ^
+  19 |     }
+  20 |     
+  21 |     if (!session?.user?.id) {
+Error: Route "/api/user/profile" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/user/profile/route.ts:18:39)
+  16 |       // フォールバック: getServerSessionを使用
+  17 |       const { authOptions } = await import('@/lib/auth-options');
+> 18 |       session = await getServerSession(authOptions);
+     |                                       ^
+  19 |     }
+  20 |     
+  21 |     if (!session?.user?.id) {
+ GET /api/user/profile 200 in 468ms
