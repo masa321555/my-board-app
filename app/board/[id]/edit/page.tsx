@@ -17,12 +17,12 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 interface Post {
-  _id: string;
+  id: string;
   title: string;
   content: string;
   author: {
-    _id: string;
-  };
+    id: string;
+  } | string;
 }
 
 export default function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
@@ -82,7 +82,7 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
       const data: Post = await response.json();
       
       // 作成者本人かチェック
-      if ((session?.user as any)?.id !== data.author._id) {
+      if ((session?.user as any)?.id !== (typeof data.author === 'object' ? data.author.id : data.author)) {
         throw new Error('編集権限がありません');
       }
 

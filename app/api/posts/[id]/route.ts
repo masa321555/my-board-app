@@ -4,6 +4,7 @@ import { authOptions } from '@/src/auth';
 import dbConnect from '@/lib/mongodb';
 import Post from '@/models/Post';
 import { z } from 'zod';
+import { normalizePost } from '@/utils/dataTransform';
 
 // 投稿更新のバリデーションスキーマ
 const updatePostSchema = z.object({
@@ -40,7 +41,10 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(post);
+    // データを正規化
+    const normalizedPost = normalizePost(post);
+
+    return NextResponse.json(normalizedPost);
   } catch (error) {
     console.error('投稿取得エラー:', error);
     return NextResponse.json(
@@ -101,7 +105,10 @@ export async function PUT(
       .populate('author', 'name email')
       .lean();
 
-    return NextResponse.json(updatedPost);
+    // データを正規化
+    const normalizedPost = normalizePost(updatedPost);
+
+    return NextResponse.json(normalizedPost);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

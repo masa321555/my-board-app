@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/src/auth';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
+import { normalizeUser } from '@/utils/dataTransform';
 
 // プロフィール取得
 export async function GET(_request: NextRequest) {
@@ -27,17 +28,10 @@ export async function GET(_request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      bio: user.bio || '',
-      location: user.location || '',
-      website: user.website || '',
-      avatar: user.avatar || null,
-      emailVerified: user.emailVerified,
-      createdAt: user.createdAt,
-    });
+    // データを正規化
+    const normalizedUser = normalizeUser(user);
+    
+    return NextResponse.json(normalizedUser);
   } catch (error) {
     console.error('Profile fetch error:', error);
     return NextResponse.json(
@@ -117,17 +111,12 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // データを正規化
+    const normalizedUser = normalizeUser(updatedUser);
+    
     return NextResponse.json({
       message: 'プロフィールを更新しました',
-      user: {
-        id: updatedUser._id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        bio: updatedUser.bio,
-        location: updatedUser.location,
-        website: updatedUser.website,
-        avatar: updatedUser.avatar,
-      },
+      user: normalizedUser,
     });
   } catch (error) {
     console.error('Profile update error:', error);

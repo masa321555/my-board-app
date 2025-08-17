@@ -17,7 +17,7 @@ import PostForm from './PostForm';
 import PostList from './PostList';
 
 interface Post {
-  _id: string;
+  id: string;
   content: string;
   createdAt: string;
   updatedAt: string;
@@ -79,7 +79,7 @@ export default function BoardApp() {
     if (!editingPost) return;
 
     try {
-      const response = await fetch(`/api/posts/${editingPost._id}`, {
+      const response = await fetch(`/api/posts/${editingPost.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
