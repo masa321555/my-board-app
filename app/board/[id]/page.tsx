@@ -25,14 +25,14 @@ import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
 interface Post {
-  _id: string;
+  id: string;
   title: string;
   content: string;
   author: {
-    _id: string;
+    id: string;
     name: string;
     email: string;
-  };
+  } | string;
   authorName: string;
   createdAt: string;
   updatedAt: string;
@@ -93,9 +93,15 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
       }
 
       const data = await response.json();
-      safeSetState(() => {
-        setPost(data);
-      });
+      
+      // データの安全性を確保
+      if (data) {
+        safeSetState(() => {
+          setPost(data);
+        });
+      } else {
+        throw new Error('投稿データが無効です');
+      }
     } catch (_error) {
       safeSetState(() => {
         setError(_error instanceof Error ? _error.message : 'エラーが発生しました');
@@ -203,7 +209,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
     return null;
   }
 
-  const isAuthor = (session?.user as any)?.id === post.author._id;
+  const isAuthor = (session?.user as any)?.id === (typeof post.author === 'object' ? post.author.id : post.author);
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>

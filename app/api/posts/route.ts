@@ -4,6 +4,7 @@ import { authOptions } from '@/src/auth';
 import dbConnect from '@/lib/mongodb';
 import Post from '@/models/Post';
 import { z } from 'zod';
+import { normalizePosts, normalizePost } from '@/utils/dataTransform';
 
 // 投稿作成のバリデーションスキーマ
 const createPostSchema = z.object({
@@ -42,8 +43,11 @@ export async function GET(request: NextRequest) {
     // 総投稿数を取得
     const total = await Post.countDocuments();
 
+    // データを正規化
+    const normalizedPosts = normalizePosts(posts || []);
+
     return NextResponse.json({
-      posts,
+      posts: normalizedPosts,
       pagination: {
         page,
         limit,
@@ -92,7 +96,10 @@ export async function POST(request: NextRequest) {
       .populate('author', 'name email')
       .lean();
 
-    return NextResponse.json(createdPost, { status: 201 });
+    // データを正規化
+    const normalizedPost = normalizePost(createdPost);
+
+    return NextResponse.json(normalizedPost, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

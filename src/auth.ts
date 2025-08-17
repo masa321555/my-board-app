@@ -48,7 +48,7 @@ export const authOptions: any = {
           const passwordsMatch = await bcrypt.compare(password, user.password);
           if (passwordsMatch) {
             return {
-              id: user._id.toString(),
+              id: user._id ? user._id.toString() : user.id || '',
               email: user.email,
               name: user.name,
               role: user.role,

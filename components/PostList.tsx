@@ -12,7 +12,7 @@ import {
 import { Edit, Delete } from '@mui/icons-material';
 
 interface Post {
-  _id: string;
+  id: string;
   content: string;
   createdAt: string;
   updatedAt: string;
@@ -49,7 +49,7 @@ export default function PostList({ posts, onEdit, onDelete }: PostListProps) {
   return (
     <Box sx={{ mt: 3 }}>
       {posts.map((post, index) => (
-        <Box key={post._id} sx={{ mb: 2 }}>
+        <Box key={post.id} sx={{ mb: 2 }}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -67,7 +67,7 @@ export default function PostList({ posts, onEdit, onDelete }: PostListProps) {
                     </IconButton>
                     <IconButton
                       size="small"
-                      onClick={() => onDelete(post._id)}
+                      onClick={() => onDelete(post.id)}
                       color="error"
                     >
                       <Delete fontSize="small" />

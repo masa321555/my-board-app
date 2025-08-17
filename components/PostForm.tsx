@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 
 interface Post {
-  _id: string;
+  id: string;
   content: string;
   createdAt: string;
   updatedAt: string;

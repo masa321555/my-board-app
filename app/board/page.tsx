@@ -27,20 +27,10 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import StableAlert from '@/components/StableAlert';
+import { postsResponseSchema, type Post as ApiPost } from '@/schemas/api';
 
-interface Post {
-  _id: string;
-  title: string;
-  content: string;
-  author: {
-    _id: string;
-    name: string;
-    email: string;
-  };
-  authorName: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// PostタイプはAPIスキーマからインポート
+type Post = ApiPost;
 
 interface Pagination {
   page: number;
@@ -146,10 +136,28 @@ export default function BoardPage() {
       }
 
       const data = await response.json();
-      safeSetState(() => {
-        setPosts(data.posts);
-        setPagination(data.pagination);
-      });
+      
+      // スキーマ検証
+      const validatedData = postsResponseSchema.safeParse(data);
+      
+      if (validatedData.success) {
+        safeSetState(() => {
+          setPosts(validatedData.data.posts);
+          setPagination(validatedData.data.pagination);
+        });
+      } else {
+        console.error('レスポンススキーマ検証エラー:', validatedData.error);
+        // フォールバック
+        safeSetState(() => {
+          setPosts([]);
+          setPagination({
+            page: 1,
+            limit: 10,
+            total: 0,
+            totalPages: 0
+          });
+        });
+      }
     } catch (error: any) {
       // AbortErrorの場合は無視
       if (error?.name === 'AbortError' || error?.code === 'ABORT_ERR') {
@@ -366,8 +374,14 @@ export default function BoardPage() {
         </Paper>
       ) : (
         <Box>
-          {posts.map((post) => (
-            <Card key={`post-${post._id}-${dynamicKey}`} sx={{ mb: 2 }}>
+          {posts.map((post) => {
+            // データの安全性を確保
+            if (!post || !post.id) {
+              console.warn('無効な投稿データ:', post);
+              return null;
+            }
+            return (
+            <Card key={`post-${post.id}-${dynamicKey}`} sx={{ mb: 2 }}>
               <CardContent>
                 <Typography variant="h6" component="h2" gutterBottom>
                   {post.title}
@@ -386,16 +400,16 @@ export default function BoardPage() {
               <CardActions sx={{ justifyContent: 'space-between' }}>
                 <Button 
                   size="small" 
-                  onClick={() => handleViewPostClick(post._id)}
+                  onClick={() => handleViewPostClick(post.id)}
                   disabled={isNavigating}
                 >
                   詳細を見る
                 </Button>
-                {(session?.user as any)?.id === post.author._id && (
+                {(session?.user as any)?.id === (typeof post.author === 'object' ? post.author.id : post.author) && (
                   <Box>
                     <IconButton
                       size="small"
-                      onClick={() => handleEditPostClick(post._id)}
+                      onClick={() => handleEditPostClick(post.id)}
                       aria-label="編集"
                       disabled={isNavigating}
                     >
@@ -403,7 +417,7 @@ export default function BoardPage() {
                     </IconButton>
                     <IconButton
                       size="small"
-                      onClick={() => handleDeleteClick(post._id)}
+                      onClick={() => handleDeleteClick(post.id)}
                       aria-label="削除"
                       color="error"
                       disabled={isDeleting || isNavigating}
@@ -414,7 +428,8 @@ export default function BoardPage() {
                 )}
               </CardActions>
             </Card>
-          ))}
+            );
+          })}
 
           {pagination.totalPages > 1 && (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
