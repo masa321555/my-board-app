@@ -8,7 +8,7 @@ import { z } from 'zod';
 const sendEmailSchema = z.object({
   type: z.enum(['welcome', 'verification', 'password-reset']),
   to: z.string().email(),
-  data: z.record(z.any()),
+  data: z.record(z.string(), z.any()),
 });
 
 export async function POST(request: NextRequest) {
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation error', details: error.errors },
+        { error: 'Validation error', details: error.issues },
         { status: 400 }
       );
     }
