@@ -11,11 +11,9 @@ import {
   TextField,
   Button,
   Avatar,
-  Grid,
   Divider,
   Alert,
   CircularProgress,
-  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -23,6 +21,7 @@ import {
   DialogContentText,
   LinearProgress,
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import {
   Person as PersonIcon,
   Email as EmailIcon,
@@ -318,7 +317,7 @@ export default function ProfilePage() {
 
           <Grid container spacing={4}>
             {/* 左側：アバターとアクション */}
-            <Grid item xs={12} md={4}>
+            <Grid xs={12} md={4}>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Avatar
                   src={avatarUrl || undefined}
@@ -376,7 +375,7 @@ export default function ProfilePage() {
             </Grid>
 
             {/* 右側：プロフィール情報 */}
-            <Grid item xs={12} md={8}>
+            <Grid xs={12} md={8}>
               <Box sx={{ mb: 3 }}>
                 <TextField
                   fullWidth

@@ -21,7 +21,7 @@ import {
 } from '@mui/icons-material';
 
 function VerifyContent() {
-  const router = useRouter();
+  const _router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const statusParam = searchParams.get('status');

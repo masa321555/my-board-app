@@ -6,7 +6,6 @@ import {
   Container,
   Box,
   Typography,
-  Grid,
   Paper,
   Card,
   CardContent,
@@ -15,6 +14,7 @@ import {
   Divider,
   Skeleton,
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import {
   Dashboard as DashboardIcon,
   Article as ArticleIcon,
@@ -122,7 +122,7 @@ export default function DashboardPage() {
 
         {/* 統計カード */}
         <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid xs={12} sm={6} md={3}>
             <StatCard
               title="投稿数"
               value={stats?.totalPosts || 0}
@@ -130,7 +130,7 @@ export default function DashboardPage() {
               color="primary.main"
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid xs={12} sm={6} md={3}>
             <StatCard
               title="今週の投稿"
               value={stats?.recentPosts || 0}
@@ -138,7 +138,7 @@ export default function DashboardPage() {
               color="success.main"
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid xs={12} sm={6} md={3}>
             <StatCard
               title="コメント数"
               value={stats?.totalComments || 0}
@@ -146,7 +146,7 @@ export default function DashboardPage() {
               color="info.main"
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid xs={12} sm={6} md={3}>
             <StatCard
               title="プロフィール閲覧"
               value={stats?.profileViews || 0}

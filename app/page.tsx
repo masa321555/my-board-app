@@ -174,7 +174,7 @@ export default function HomePage() {
             クイックアクセス
           </Typography>
           <Grid container spacing={2} sx={{ mt: 2 }}>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid xs={12} sm={6} md={3}>
               <Card>
                 <CardContent>
                   <DashboardIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
@@ -196,7 +196,7 @@ export default function HomePage() {
               </Card>
             </Grid>
             
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid xs={12} sm={6} md={3}>
               <Card>
                 <CardContent>
                   <PersonIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
@@ -218,7 +218,7 @@ export default function HomePage() {
               </Card>
             </Grid>
             
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid xs={12} sm={6} md={3}>
               <Card>
                 <CardContent>
                   <ArticleIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
@@ -240,7 +240,7 @@ export default function HomePage() {
               </Card>
             </Grid>
             
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid xs={12} sm={6} md={3}>
               <Card>
                 <CardContent>
                   <CreateIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />

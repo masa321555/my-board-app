@@ -1,16 +1,8 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    }
-  ],
   "build": {
     "env": {
       "NPM_FLAGS": "--legacy-peer-deps --force"
     }
   },
-  "installCommand": "npm install --legacy-peer-deps --force",
-  "buildCommand": "npm run build:vercel"
+  "installCommand": "npm install --legacy-peer-deps --force"
 }

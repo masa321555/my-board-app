@@ -20,7 +20,7 @@ export default function ForgotPasswordPage() {
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [isNavigating, setIsNavigating] = useState(false);
+  const [isNavigating, _setIsNavigating] = useState(false);
   const isSubmitting = useRef(false);
   const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const mountedRef = useRef(true);

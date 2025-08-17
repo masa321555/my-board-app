@@ -4676,3 +4676,483 @@ Error: Route "/api/user/dashboard" used `cookies().getAll()`. `cookies()` should
   11 |     if (!session?.user?.id) {
   12 |       return NextResponse.json(
  GET /api/user/dashboard 200 in 357ms
+ ⨯ ./app/dashboard/page.tsx:17:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 15 |[39m   [33mSkeleton[39m[33m,[39m
+ [90m 16 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 17 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 18 |[39m [36mimport[39m {
+ [90m 19 |[39m   [33mDashboard[39m [36mas[39m [33mDashboardIcon[39m[33m,[39m
+ [90m 20 |[39m   [33mArticle[39m [36mas[39m [33mArticleIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/page.tsx [Client Component Browser]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/page.tsx [Client Component SSR]
+    ./app/dashboard/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/dashboard/page.tsx:17:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 15 |[39m   [33mSkeleton[39m[33m,[39m
+ [90m 16 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 17 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 18 |[39m [36mimport[39m {
+ [90m 19 |[39m   [33mDashboard[39m [36mas[39m [33mDashboardIcon[39m[33m,[39m
+ [90m 20 |[39m   [33mArticle[39m [36mas[39m [33mArticleIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/page.tsx [Client Component Browser]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/page.tsx [Client Component SSR]
+    ./app/dashboard/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/dashboard/page.tsx:17:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 15 |[39m   [33mSkeleton[39m[33m,[39m
+ [90m 16 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 17 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 18 |[39m [36mimport[39m {
+ [90m 19 |[39m   [33mDashboard[39m [36mas[39m [33mDashboardIcon[39m[33m,[39m
+ [90m 20 |[39m   [33mArticle[39m [36mas[39m [33mArticleIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/page.tsx [Client Component Browser]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/page.tsx [Client Component SSR]
+    ./app/dashboard/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/dashboard/page.tsx:17:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 15 |[39m   [33mSkeleton[39m[33m,[39m
+ [90m 16 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 17 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 18 |[39m [36mimport[39m {
+ [90m 19 |[39m   [33mDashboard[39m [36mas[39m [33mDashboardIcon[39m[33m,[39m
+ [90m 20 |[39m   [33mArticle[39m [36mas[39m [33mArticleIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/page.tsx [Client Component Browser]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/page.tsx [Client Component SSR]
+    ./app/dashboard/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/dashboard/page.tsx:17:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 15 |[39m   [33mSkeleton[39m[33m,[39m
+ [90m 16 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 17 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 18 |[39m [36mimport[39m {
+ [90m 19 |[39m   [33mDashboard[39m [36mas[39m [33mDashboardIcon[39m[33m,[39m
+ [90m 20 |[39m   [33mArticle[39m [36mas[39m [33mArticleIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/page.tsx [Client Component Browser]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/page.tsx [Client Component SSR]
+    ./app/dashboard/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/dashboard/page.tsx:17:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 15 |[39m   [33mSkeleton[39m[33m,[39m
+ [90m 16 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 17 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 18 |[39m [36mimport[39m {
+ [90m 19 |[39m   [33mDashboard[39m [36mas[39m [33mDashboardIcon[39m[33m,[39m
+ [90m 20 |[39m   [33mArticle[39m [36mas[39m [33mArticleIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/page.tsx [Client Component Browser]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/page.tsx [Client Component SSR]
+    ./app/dashboard/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/dashboard/page.tsx:17:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 15 |[39m   [33mSkeleton[39m[33m,[39m
+ [90m 16 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 17 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 18 |[39m [36mimport[39m {
+ [90m 19 |[39m   [33mDashboard[39m [36mas[39m [33mDashboardIcon[39m[33m,[39m
+ [90m 20 |[39m   [33mArticle[39m [36mas[39m [33mArticleIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/page.tsx [Client Component Browser]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/page.tsx [Client Component SSR]
+    ./app/dashboard/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/dashboard/page.tsx:17:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 15 |[39m   [33mSkeleton[39m[33m,[39m
+ [90m 16 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 17 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 18 |[39m [36mimport[39m {
+ [90m 19 |[39m   [33mDashboard[39m [36mas[39m [33mDashboardIcon[39m[33m,[39m
+ [90m 20 |[39m   [33mArticle[39m [36mas[39m [33mArticleIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/page.tsx [Client Component Browser]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/page.tsx [Client Component SSR]
+    ./app/dashboard/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/profile/page.tsx:24:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 22 |[39m   [33mLinearProgress[39m[33m,[39m
+ [90m 23 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 24 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 25 |[39m [36mimport[39m {
+ [90m 26 |[39m   [33mPerson[39m [36mas[39m [33mPersonIcon[39m[33m,[39m
+ [90m 27 |[39m   [33mEmail[39m [36mas[39m [33mEmailIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/profile/page.tsx [Client Component Browser]
+    ./app/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/profile/page.tsx [Client Component SSR]
+    ./app/profile/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/profile/page.tsx:24:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 22 |[39m   [33mLinearProgress[39m[33m,[39m
+ [90m 23 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 24 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 25 |[39m [36mimport[39m {
+ [90m 26 |[39m   [33mPerson[39m [36mas[39m [33mPersonIcon[39m[33m,[39m
+ [90m 27 |[39m   [33mEmail[39m [36mas[39m [33mEmailIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/profile/page.tsx [Client Component Browser]
+    ./app/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/profile/page.tsx [Client Component SSR]
+    ./app/profile/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/profile/page.tsx:24:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 22 |[39m   [33mLinearProgress[39m[33m,[39m
+ [90m 23 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 24 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 25 |[39m [36mimport[39m {
+ [90m 26 |[39m   [33mPerson[39m [36mas[39m [33mPersonIcon[39m[33m,[39m
+ [90m 27 |[39m   [33mEmail[39m [36mas[39m [33mEmailIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/profile/page.tsx [Client Component Browser]
+    ./app/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/profile/page.tsx [Client Component SSR]
+    ./app/profile/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/profile/page.tsx:24:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 22 |[39m   [33mLinearProgress[39m[33m,[39m
+ [90m 23 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 24 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 25 |[39m [36mimport[39m {
+ [90m 26 |[39m   [33mPerson[39m [36mas[39m [33mPersonIcon[39m[33m,[39m
+ [90m 27 |[39m   [33mEmail[39m [36mas[39m [33mEmailIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/profile/page.tsx [Client Component Browser]
+    ./app/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/profile/page.tsx [Client Component SSR]
+    ./app/profile/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/profile/page.tsx:24:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 22 |[39m   [33mLinearProgress[39m[33m,[39m
+ [90m 23 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 24 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 25 |[39m [36mimport[39m {
+ [90m 26 |[39m   [33mPerson[39m [36mas[39m [33mPersonIcon[39m[33m,[39m
+ [90m 27 |[39m   [33mEmail[39m [36mas[39m [33mEmailIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/profile/page.tsx [Client Component Browser]
+    ./app/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/profile/page.tsx [Client Component SSR]
+    ./app/profile/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/profile/page.tsx:24:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 22 |[39m   [33mLinearProgress[39m[33m,[39m
+ [90m 23 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 24 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 25 |[39m [36mimport[39m {
+ [90m 26 |[39m   [33mPerson[39m [36mas[39m [33mPersonIcon[39m[33m,[39m
+ [90m 27 |[39m   [33mEmail[39m [36mas[39m [33mEmailIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/profile/page.tsx [Client Component Browser]
+    ./app/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/profile/page.tsx [Client Component SSR]
+    ./app/profile/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/profile/page.tsx:24:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 22 |[39m   [33mLinearProgress[39m[33m,[39m
+ [90m 23 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 24 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 25 |[39m [36mimport[39m {
+ [90m 26 |[39m   [33mPerson[39m [36mas[39m [33mPersonIcon[39m[33m,[39m
+ [90m 27 |[39m   [33mEmail[39m [36mas[39m [33mEmailIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/profile/page.tsx [Client Component Browser]
+    ./app/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/profile/page.tsx [Client Component SSR]
+    ./app/profile/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/profile/page.tsx:24:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 22 |[39m   [33mLinearProgress[39m[33m,[39m
+ [90m 23 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 24 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 25 |[39m [36mimport[39m {
+ [90m 26 |[39m   [33mPerson[39m [36mas[39m [33mPersonIcon[39m[33m,[39m
+ [90m 27 |[39m   [33mEmail[39m [36mas[39m [33mEmailIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/profile/page.tsx [Client Component Browser]
+    ./app/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/profile/page.tsx [Client Component SSR]
+    ./app/profile/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/profile/page.tsx:24:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 22 |[39m   [33mLinearProgress[39m[33m,[39m
+ [90m 23 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 24 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 25 |[39m [36mimport[39m {
+ [90m 26 |[39m   [33mPerson[39m [36mas[39m [33mPersonIcon[39m[33m,[39m
+ [90m 27 |[39m   [33mEmail[39m [36mas[39m [33mEmailIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/profile/page.tsx [Client Component Browser]
+    ./app/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/profile/page.tsx [Client Component SSR]
+    ./app/profile/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/profile/page.tsx:24:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 22 |[39m   [33mLinearProgress[39m[33m,[39m
+ [90m 23 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 24 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 25 |[39m [36mimport[39m {
+ [90m 26 |[39m   [33mPerson[39m [36mas[39m [33mPersonIcon[39m[33m,[39m
+ [90m 27 |[39m   [33mEmail[39m [36mas[39m [33mEmailIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/profile/page.tsx [Client Component Browser]
+    ./app/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/profile/page.tsx [Client Component SSR]
+    ./app/profile/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/profile/page.tsx:24:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 22 |[39m   [33mLinearProgress[39m[33m,[39m
+ [90m 23 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 24 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 25 |[39m [36mimport[39m {
+ [90m 26 |[39m   [33mPerson[39m [36mas[39m [33mPersonIcon[39m[33m,[39m
+ [90m 27 |[39m   [33mEmail[39m [36mas[39m [33mEmailIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/profile/page.tsx [Client Component Browser]
+    ./app/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/profile/page.tsx [Client Component SSR]
+    ./app/profile/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./app/profile/page.tsx:24:1
+Module not found: Can't resolve '@mui/material/Grid2'
+[0m [90m 22 |[39m   [33mLinearProgress[39m[33m,[39m
+ [90m 23 |[39m } [36mfrom[39m [32m'@mui/material'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 24 |[39m [36mimport[39m [33mGrid[39m [36mfrom[39m [32m'@mui/material/Grid2'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 25 |[39m [36mimport[39m {
+ [90m 26 |[39m   [33mPerson[39m [36mas[39m [33mPersonIcon[39m[33m,[39m
+ [90m 27 |[39m   [33mEmail[39m [36mas[39m [33mEmailIcon[39m[33m,[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/profile/page.tsx [Client Component Browser]
+    ./app/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/profile/page.tsx [Client Component SSR]
+    ./app/profile/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+

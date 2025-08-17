@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     let tokenData;
     try {
       tokenData = TokenUtils.verifyToken(validatedData.token);
-    } catch (error) {
+    } catch (_error) {
       return NextResponse.json(
         { error: 'トークンが無効または期限切れです' },
         { status: 400 }

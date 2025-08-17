@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       if (decoded.type !== 'email-confirmation') {
         throw new Error('Invalid token type');
       }
-    } catch (error) {
+    } catch (_error) {
       return NextResponse.json(
         { 
           success: false,
