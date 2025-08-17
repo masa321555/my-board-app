@@ -17,6 +17,11 @@ export const registerSchema = z.object({
     .min(8, 'パスワードは8文字以上で入力してください')
     .max(100, 'パスワードは100文字以内で入力してください')
     .refine((password) => {
+      // 開発環境ではパスワード強度チェックを緩和
+      const isDevelopment = process.env.NODE_ENV === 'development';
+      if (isDevelopment) {
+        return password.length >= 8; // 開発環境では8文字以上のみチェック
+      }
       const strength = checkPasswordStrength(password);
       return strength.isStrong;
     }, 'パスワードが弱すぎます。8文字以上で、より強力なパスワードを設定してください'),

@@ -104,6 +104,12 @@ export default function RegisterForm() {
   const onSubmit = useCallback(async (data: RegisterFormData) => {
     if (!mountedRef.current || isSubmittingRef.current || isNavigating) return;
     
+    console.log('フォーム送信開始:', { 
+      name: data.name, 
+      email: data.email, 
+      passwordLength: data.password?.length 
+    });
+    
     safeSetState(() => {
       setServerError('');
       setSuccessMessage('');
@@ -112,19 +118,29 @@ export default function RegisterForm() {
     isSubmittingRef.current = true;
 
     try {
+      const requestBody = {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      };
+      
+      console.log('APIリクエスト送信:', requestBody);
+      
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          password: data.password,
-        }),
+        body: JSON.stringify(requestBody),
+      });
+
+      console.log('APIレスポンス受信:', { 
+        status: response.status, 
+        statusText: response.statusText 
       });
 
       const result = await response.json();
+      console.log('APIレスポンス内容:', result);
 
       if (!response.ok) {
         if (mountedRef.current) {

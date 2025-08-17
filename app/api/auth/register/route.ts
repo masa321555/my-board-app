@@ -12,8 +12,15 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
+    console.log('登録リクエスト受信:', { 
+      name: body.name, 
+      email: body.email, 
+      passwordLength: body.password?.length 
+    });
+    
     // バリデーション
     const validatedData = registerSchema.parse(body);
+    console.log('バリデーション成功');
 
     await dbConnect();
 
@@ -21,39 +28,45 @@ export async function POST(request: NextRequest) {
     const existingUser = await User.findOne({ email: validatedData.email });
     
     if (existingUser) {
+      console.log('既存ユーザーが見つかりました:', validatedData.email);
       return NextResponse.json(
         { error: 'このメールアドレスは既に登録されています' },
         { status: 400 }
       );
     }
 
-    // パスワード強度をチェック（開発環境では緩和）
-    const passwordStrength = checkPasswordStrength(validatedData.password);
+    // 開発環境ではパスワード強度チェックをスキップ
     const isDevelopment = process.env.NODE_ENV === 'development';
     
-    if (!passwordStrength.isStrong && !isDevelopment) {
-      return NextResponse.json(
-        { 
-          error: 'パスワードが弱すぎます',
-          details: {
-            feedback: passwordStrength.feedback,
-            suggestions: passwordStrength.suggestions,
-          }
-        },
-        { status: 400 }
-      );
+    if (!isDevelopment) {
+      // 本番環境でのみパスワード強度をチェック
+      const passwordStrength = checkPasswordStrength(validatedData.password);
+      if (!passwordStrength.isStrong) {
+        return NextResponse.json(
+          { 
+            error: 'パスワードが弱すぎます',
+            details: {
+              feedback: passwordStrength.feedback,
+              suggestions: passwordStrength.suggestions,
+            }
+          },
+          { status: 400 }
+        );
+      }
     }
 
-    // パスワードをハッシュ化（ラウンド数を12に増やしてセキュリティ強化）
+    // パスワードをハッシュ化
     const hashedPassword = await bcrypt.hash(validatedData.password, 12);
 
-    // ユーザーを作成（開発環境ではemailVerifiedをtrueに設定）
+    // ユーザーを作成
     const user = await User.create({
       email: validatedData.email,
       password: hashedPassword,
       name: validatedData.name,
       emailVerified: isDevelopment ? true : false,
     });
+
+    console.log('ユーザー作成成功:', user.email);
 
     // メール確認トークンを生成
     const confirmationToken = TokenUtils.generateEmailConfirmationToken(
@@ -71,11 +84,9 @@ export async function POST(request: NextRequest) {
       const verificationUrl = `${process.env.APP_URL}/api/auth/verify?token=${confirmationToken}`;
       
       // 開発環境ではメール送信をスキップ
-      if (process.env.NODE_ENV === 'development') {
+      if (isDevelopment) {
         console.log('開発環境: メール送信をスキップしました');
         console.log('確認URL:', verificationUrl);
-        // 開発環境でもウェルカムメールのログを出力
-        console.log('ウェルカムメールもスキップされました');
       } else {
         await emailService.sendVerificationEmail(user.email, {
           name: user.name,
@@ -98,9 +109,18 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
+    console.error('登録エラーの詳細:', error);
+    
     if (error instanceof z.ZodError) {
+      console.log('バリデーションエラー詳細:', (error as any).errors);
       return NextResponse.json(
-        { error: 'バリデーションエラー', details: (error as any).errors },
+        { 
+          error: 'バリデーションエラー', 
+          details: (error as any).errors.map((err: any) => ({
+            field: err.path.join('.'),
+            message: err.message
+          }))
+        },
         { status: 400 }
       );
     }
