@@ -144,31 +144,32 @@ export default function RegisterForm() {
       const result = await response.json();
       console.log('APIレスポンス内容:', result);
 
-      if (!response.ok) {
-        if (mountedRef.current) {
-          if (result.details) {
-            // パスワード強度エラーの場合
+              if (!response.ok) {
+          if (mountedRef.current) {
+            if (result.details) {
+              // パスワード強度エラーの場合
+              safeSetState(() => {
+                setServerError(result.error);
+                if (result.details.suggestions) {
+                  setPasswordStrength({
+                    ...passwordStrength,
+                    suggestions: result.details.suggestions,
+                  });
+                }
+              });
+            } else {
+              safeSetState(() => {
+                setServerError(result.error || '登録に失敗しました');
+              });
+            }
+            // エラー時はisSubmittingをfalseに設定
             safeSetState(() => {
-              setServerError(result.error);
-              if (result.details.suggestions) {
-                setPasswordStrength({
-                  ...passwordStrength,
-                  suggestions: result.details.suggestions,
-                });
-              }
+              setIsSubmitting(false);
             });
-          } else {
-            safeSetState(() => {
-              setServerError(result.error || '登録に失敗しました');
-            });
+            isSubmittingRef.current = false;
           }
-          // エラー時はisSubmittingをfalseに設定
-          safeSetState(() => {
-            setIsSubmitting(false);
-          });
+          return;
         }
-        return;
-      }
 
       if (mountedRef.current) {
         safeSetState(() => {
@@ -178,7 +179,7 @@ export default function RegisterForm() {
         
         // より長い遅延を入れてからリダイレクト
         navigationTimeoutRef.current = setTimeout(() => {
-          if (mountedRef.current) {
+          if (mountedRef.current && !isNavigating) {
             try {
               // より安全なリダイレクト方法
               router.push('/auth/signin');
@@ -190,7 +191,7 @@ export default function RegisterForm() {
               } catch (fallbackError) {
                 console.error('Fallback navigation error:', fallbackError);
                 // 最後の手段としてwindow.locationを使用
-                if (mountedRef.current) {
+                if (mountedRef.current && !isNavigating) {
                   window.location.href = '/auth/signin';
                 }
               }
