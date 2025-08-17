@@ -59,7 +59,7 @@ export async function GET(_request: NextRequest) {
     };
     
     const recentPostsData = recentPostsList.map(post => ({
-      id: post._id.toString(),
+      id: (post._id as any).toString(),
       title: post.title,
       createdAt: post.createdAt.toISOString(),
       views: post.views || 0,
