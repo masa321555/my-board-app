@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import dbConnect from '@/lib/db';
+import dbConnect from '@/lib/mongodb';
 import User from '@/models/User.model';
-import { authOptions } from '@/auth';
+import { authOptions } from '@/src/lib/auth-options';
 import { emailService } from '@/lib/email/service';
 import { TokenUtils } from '@/utils/tokenUtils';
 

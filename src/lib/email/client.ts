@@ -1,4 +1,4 @@
-import * as nodemailer from 'nodemailer';
+import nodemailer from 'nodemailer';
 import { Transporter } from 'nodemailer';
 
 let transporter: Transporter | null = null;

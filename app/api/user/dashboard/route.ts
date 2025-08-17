@@ -4,7 +4,7 @@ import { authOptions } from '@/src/lib/auth-options';
 import dbConnect from '@/lib/mongodb';
 import Post from '@/models/Post';
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     

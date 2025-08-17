@@ -12,6 +12,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import StableAlert from '@/components/StableAlert';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
