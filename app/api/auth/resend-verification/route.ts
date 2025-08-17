@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     // 新しい確認トークンを生成
     const confirmationToken = TokenUtils.generateEmailConfirmationToken(
-      user._id.toString(),
+      (user._id as any).toString(),
       user.email
     );
 
