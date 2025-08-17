@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { auth } from '@/auth';
+import { auth } from '@/src/auth';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
 import { processImage } from '@/lib/imageUtils';
@@ -12,16 +11,9 @@ import { existsSync, mkdirSync } from 'fs';
 // アバター画像のアップロード
 export async function POST(request: NextRequest) {
   try {
-    let session;
-    try {
-      session = await auth();
-    } catch (authError) {
-      console.error('Auth error:', authError);
-      const { authOptions } = await import('@/lib/auth-options');
-      session = await getServerSession(authOptions);
-    }
+    const session = await auth();
     
-    if (!session?.user?.id) {
+    if (!(session?.user as any)?.id) {
       return NextResponse.json(
         { error: '認証が必要です' },
         { status: 401 }
@@ -73,7 +65,7 @@ export async function POST(request: NextRequest) {
       mkdirSync(uploadDir, { recursive: true });
     }
 
-    const fileName = `${session.user.id}_${uuidv4()}.jpg`;
+    const fileName = `${(session.user as any).id}_${uuidv4()}.jpg`;
     const filePath = join(uploadDir, fileName);
     
     await writeFile(filePath, processedImage);
@@ -85,14 +77,14 @@ export async function POST(request: NextRequest) {
     await dbConnect();
     
     // 古いアバターのパスを取得（後で削除するため）
-    const oldUser = await User.findById(session.user.id).select('avatar');
+    const oldUser = await User.findById((session.user as any).id).select('avatar');
     const oldAvatarPath = oldUser?.avatar?.startsWith('/uploads/avatars/') 
       ? join(process.cwd(), 'public', oldUser.avatar)
       : null;
     
     // 新しいアバターURLを保存
     const updatedUser = await User.findByIdAndUpdate(
-      session.user.id,
+      (session.user as any).id,
       {
         avatar: avatarUrl,
         updatedAt: new Date(),
@@ -133,16 +125,9 @@ export async function POST(request: NextRequest) {
 // アバター画像の削除
 export async function DELETE(_request: NextRequest) {
   try {
-    let session;
-    try {
-      session = await auth();
-    } catch (authError) {
-      console.error('Auth error:', authError);
-      const { authOptions } = await import('@/lib/auth-options');
-      session = await getServerSession(authOptions);
-    }
+    const session = await auth();
     
-    if (!session?.user?.id) {
+    if (!(session?.user as any)?.id) {
       return NextResponse.json(
         { error: '認証が必要です' },
         { status: 401 }
@@ -152,7 +137,7 @@ export async function DELETE(_request: NextRequest) {
     await dbConnect();
     
     // 現在のアバター情報を取得
-    const user = await User.findById(session.user.id).select('avatar');
+    const user = await User.findById((session.user as any).id).select('avatar');
     
     if (user?.avatar && user.avatar.startsWith('/uploads/avatars/')) {
       // ローカルファイルパスを生成
@@ -169,7 +154,7 @@ export async function DELETE(_request: NextRequest) {
     
     // データベースからアバターを削除
     const updatedUser = await User.findByIdAndUpdate(
-      session.user.id,
+      (session.user as any).id,
       {
         avatar: null,
         updatedAt: new Date(),

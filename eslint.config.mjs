@@ -10,6 +10,16 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  {
+    ignores: [
+      "src/app.backup",
+      "**/*.backup",
+      "**/backup/**",
+      ".next",
+      "node_modules",
+      "log/**"
+    ]
+  },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     rules: {

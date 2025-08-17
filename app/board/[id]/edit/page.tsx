@@ -82,7 +82,7 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
       const data: Post = await response.json();
       
       // 作成者本人かチェック
-      if (session?.user?.id !== data.author._id) {
+      if ((session?.user as any)?.id !== data.author._id) {
         throw new Error('編集権限がありません');
       }
 
@@ -90,9 +90,9 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
         setTitle(data.title);
         setContent(data.content);
       });
-    } catch (error) {
+    } catch (_error) {
       safeSetState(() => {
-        setError(error instanceof Error ? error.message : 'エラーが発生しました');
+        setError(_error instanceof Error ? _error.message : 'エラーが発生しました');
       });
     } finally {
       safeSetState(() => {
@@ -145,9 +145,9 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
           }
         }
       }, 2000);
-    } catch (error) {
+    } catch (_error) {
       safeSetState(() => {
-        setError(error instanceof Error ? error.message : 'エラーが発生しました');
+        setError(_error instanceof Error ? _error.message : 'エラーが発生しました');
         setIsSaving(false);
       });
     }

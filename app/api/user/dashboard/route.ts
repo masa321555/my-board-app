@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/src/lib/auth-options';
+import { auth } from '@/src/auth';
 import dbConnect from '@/lib/mongodb';
 import Post from '@/models/Post';
 
 export async function GET(_request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     
-    if (!session?.user?.id) {
+    if (!(session?.user as any)?.id) {
       return NextResponse.json(
         { error: '認証が必要です' },
         { status: 401 }
@@ -18,7 +17,7 @@ export async function GET(_request: NextRequest) {
     await dbConnect();
     
     // ユーザーの投稿統計を取得
-    const userId = session.user.id;
+    const userId = (session.user as any).id;
     
     // 全投稿数
     const totalPosts = await Post.countDocuments({ 

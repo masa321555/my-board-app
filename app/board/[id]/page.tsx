@@ -96,9 +96,9 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
       safeSetState(() => {
         setPost(data);
       });
-    } catch (error) {
+    } catch (_error) {
       safeSetState(() => {
-        setError(error instanceof Error ? error.message : 'エラーが発生しました');
+        setError(_error instanceof Error ? _error.message : 'エラーが発生しました');
       });
     } finally {
       safeSetState(() => {
@@ -139,9 +139,9 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
           }
         }
       }, 2000);
-    } catch (error) {
+    } catch (_error) {
       safeSetState(() => {
-        setError(error instanceof Error ? error.message : 'エラーが発生しました');
+        setError(_error instanceof Error ? _error.message : 'エラーが発生しました');
         setIsDeleting(false);
       });
     }
@@ -203,7 +203,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
     return null;
   }
 
-  const isAuthor = session?.user?.id === post.author._id;
+  const isAuthor = (session?.user as any)?.id === post.author._id;
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>

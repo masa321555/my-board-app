@@ -38,7 +38,7 @@ export class TokenUtils {
   static verifyToken(token: string): TokenPayload {
     try {
       return jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload;
-    } catch (error) {
+    } catch (_error) {
       throw new Error('無効なトークンです');
     }
   }

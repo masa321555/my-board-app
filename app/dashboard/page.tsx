@@ -52,7 +52,7 @@ export default function DashboardPage() {
   useEffect(() => {
     // ダッシュボードデータを取得
     const fetchDashboardData = async () => {
-      if (!session?.user?.id) return;
+      if (!(session?.user as any)?.id) return;
       
       setIsLoading(true);
       try {

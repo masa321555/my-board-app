@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { auth } from '@/src/auth';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User.model';
-import { authOptions } from '@/src/lib/auth-options';
 import { emailService } from '@/lib/email/service';
 import { TokenUtils } from '@/utils/tokenUtils';
 
@@ -35,7 +34,7 @@ function checkRateLimit(email: string): boolean {
 export async function POST(request: NextRequest) {
   try {
     // セッションを確認
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     
     if (!session || !session.user?.email) {
       return NextResponse.json(

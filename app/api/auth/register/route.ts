@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
     
     // 詳細なエラー情報をログに出力
     let errorMessage = 'ユーザー登録に失敗しました';
-    let errorDetails: any = {};
+    const errorDetails: any = {};
     
     if (error instanceof Error) {
       errorMessage = error.message;

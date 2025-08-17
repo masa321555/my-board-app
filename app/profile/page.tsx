@@ -76,7 +76,7 @@ export default function ProfilePage() {
       }
     };
 
-    if (session?.user?.id) {
+    if ((session?.user as any)?.id) {
       fetchProfile();
     }
   }, [session]);
@@ -221,7 +221,7 @@ export default function ProfilePage() {
             } else {
               resolve({ ok: false, data });
             }
-          } catch (error) {
+          } catch (_error) {
             reject(new Error('レスポンスの解析に失敗しました'));
           }
         });

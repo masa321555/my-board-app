@@ -72,7 +72,7 @@ export default function ProtectedLayout({
   }
 
   // メール確認が必要な場合
-  if (requireEmailVerified && !session?.user?.emailVerified) {
+  if (requireEmailVerified && !(session?.user as any)?.emailVerified) {
     return (
       <Container>
         <Box

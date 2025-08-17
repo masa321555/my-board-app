@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { auth } from '@/src/auth';
 import bcrypt from 'bcryptjs';
-import { authOptions } from '@/src/lib/auth-options';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User.model';
 import Post from '@/models/Post';
@@ -9,9 +8,9 @@ import Post from '@/models/Post';
 export async function DELETE(request: NextRequest) {
   try {
     // セッションを確認
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     
-    if (!session?.user?.id) {
+    if (!(session?.user as any)?.id) {
       return NextResponse.json(
         { error: '認証が必要です' },
         { status: 401 }
@@ -31,7 +30,7 @@ export async function DELETE(request: NextRequest) {
     await dbConnect();
 
     // ユーザーを取得（パスワード含む）
-    const user = await User.findById(session.user.id).select('+password');
+    const user = await User.findById((session.user as any).id).select('+password');
     
     if (!user) {
       return NextResponse.json(

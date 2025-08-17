@@ -17,7 +17,7 @@ import StableAlert from '@/components/StableAlert';
 
 export default function NewPostPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [error, setError] = useState('');

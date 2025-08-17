@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import {
   Container,
@@ -16,7 +16,6 @@ import { CheckCircle, Email } from '@mui/icons-material';
 
 export default function VerifyEmailPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const [mounted, setMounted] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -32,7 +31,7 @@ export default function VerifyEmailPage() {
 
   // 認証済みの場合は掲示板にリダイレクト
   useEffect(() => {
-    if (mounted && status === 'authenticated' && session?.user?.emailVerified) {
+    if (mounted && status === 'authenticated' && (session?.user as any)?.emailVerified) {
       router.push('/board');
     }
   }, [mounted, status, session, router]);
@@ -51,7 +50,7 @@ export default function VerifyEmailPage() {
       
       // 仮の成功メッセージ
       setVerificationStatus('success');
-    } catch (error) {
+    } catch (_error) {
       setVerificationStatus('error');
     } finally {
       if (mounted) {

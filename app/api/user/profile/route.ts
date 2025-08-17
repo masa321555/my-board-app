@@ -1,24 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { auth } from '@/auth';
+import { auth } from '@/src/auth';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
 
 // プロフィール取得
 export async function GET(_request: NextRequest) {
   try {
-    // より安全なセッション取得
-    let session;
-    try {
-      session = await auth();
-    } catch (authError) {
-      console.error('Auth error:', authError);
-      // フォールバック: getServerSessionを使用
-      const { authOptions } = await import('@/lib/auth-options');
-      session = await getServerSession(authOptions);
-    }
+    const session = await auth();
     
-    if (!session?.user?.id) {
+    if (!(session?.user as any)?.id) {
       return NextResponse.json(
         { error: '認証が必要です' },
         { status: 401 }
@@ -27,7 +17,7 @@ export async function GET(_request: NextRequest) {
 
     await dbConnect();
     
-    const user = await User.findById(session.user.id).select('-password');
+    const user = await User.findById((session.user as any).id).select('-password');
     
     if (!user) {
       return NextResponse.json(
@@ -59,18 +49,9 @@ export async function GET(_request: NextRequest) {
 // プロフィール更新
 export async function PUT(request: NextRequest) {
   try {
-    // より安全なセッション取得
-    let session;
-    try {
-      session = await auth();
-    } catch (authError) {
-      console.error('Auth error:', authError);
-      // フォールバック: getServerSessionを使用
-      const { authOptions } = await import('@/lib/auth-options');
-      session = await getServerSession(authOptions);
-    }
+    const session = await auth();
     
-    if (!session?.user?.id) {
+    if (!(session?.user as any)?.id) {
       return NextResponse.json(
         { error: '認証が必要です' },
         { status: 401 }
@@ -117,7 +98,7 @@ export async function PUT(request: NextRequest) {
     await dbConnect();
 
     const updatedUser = await User.findByIdAndUpdate(
-      session.user.id,
+      (session.user as any).id,
       {
         name: name.trim(),
         bio: bio?.trim() || '',

@@ -1,7 +1,53 @@
 import nodemailer from 'nodemailer';
 import { Transporter } from 'nodemailer';
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
 let transporter: Transporter | null = null;
+
+// ダミートランスポーターの作成
+function createDummyTransporter(context: string): Transporter {
+  const dummyTransporter = Object.create(nodemailer.createTransport.prototype);
+  
+  dummyTransporter.sendMail = async (mailOptions: SMTPTransport.MailOptions): Promise<SMTPTransport.SentMessageInfo> => {
+    console.log(`[${context}] Email would be sent:`, {
+      to: mailOptions.to,
+      subject: mailOptions.subject
+    });
+    
+    // Convert all addresses to strings
+    const toAddresses = Array.isArray(mailOptions.to) 
+      ? mailOptions.to.map(addr => addr?.toString() || '')
+      : [mailOptions.to?.toString() || ''];
+    
+    return {
+      messageId: `dummy-${context}-${Date.now()}@local`,
+      envelope: {
+        from: mailOptions.from?.toString() || 'noreply@local',
+        to: toAddresses
+      },
+      accepted: toAddresses,
+      rejected: [],
+      pending: [],
+      response: '250 OK: Dummy message sent'
+    };
+  };
+  
+  dummyTransporter.verify = async (): Promise<true> => {
+    console.log(`[${context}] Dummy transporter verified`);
+    return true;
+  };
+  
+  dummyTransporter.close = async (): Promise<void> => {
+    console.log(`[${context}] Dummy transporter closed`);
+  };
+  
+  // その他の必要なメソッドのスタブ
+  dummyTransporter.isIdle = () => true;
+  dummyTransporter.set = () => dummyTransporter;
+  dummyTransporter.get = () => undefined;
+  
+  return dummyTransporter as Transporter;
+}
 
 export function getEmailClient(): Transporter {
   if (transporter) {
@@ -14,15 +60,7 @@ export function getEmailClient(): Transporter {
   // メール設定が存在しない場合、ダミートランスポーターを返す
   if (!process.env.EMAIL_PROVIDER && !process.env.MAIL_HOST && !process.env.GMAIL_USER && !process.env.YAHOO_USER) {
     console.warn('No email configuration found. Email sending will be disabled.');
-    // ダミートランスポーターを返す
-    transporter = {
-      sendMail: async (options: any) => {
-        console.log('Email would be sent:', options);
-        return { messageId: 'dummy-' + Date.now() };
-      },
-      verify: async () => true,
-      close: async () => {},
-    } as any;
+    transporter = createDummyTransporter('no-config');
     return transporter;
   }
   
@@ -33,15 +71,7 @@ export function getEmailClient(): Transporter {
 
       if (!gmailUser || !gmailPassword) {
         console.error('Gmail credentials not configured. Please set GMAIL_USER and GMAIL_APP_PASSWORD environment variables.');
-        // ダミートランスポーターを返す
-        transporter = {
-          sendMail: async (options: any) => {
-            console.log('Email would be sent (Gmail not configured):', options);
-            return { messageId: 'dummy-gmail-' + Date.now() };
-          },
-          verify: async () => true,
-          close: async () => {},
-        } as any;
+        transporter = createDummyTransporter('gmail-not-configured');
         return transporter;
       }
 
@@ -65,15 +95,7 @@ export function getEmailClient(): Transporter {
 
       if (!yahooUser || !yahooPassword) {
         console.error('Yahoo credentials not configured. Please set YAHOO_USER and YAHOO_APP_PASSWORD environment variables.');
-        // ダミートランスポーターを返す
-        transporter = {
-          sendMail: async (options: any) => {
-            console.log('Email would be sent (Yahoo not configured):', options);
-            return { messageId: 'dummy-yahoo-' + Date.now() };
-          },
-          verify: async () => true,
-          close: async () => {},
-        } as any;
+        transporter = createDummyTransporter('yahoo-not-configured');
         return transporter;
       }
 
@@ -102,15 +124,7 @@ export function getEmailClient(): Transporter {
 
       if (!smtpHost || !smtpUser || !smtpPass) {
         console.error('SMTP credentials not configured. Please set MAIL_HOST, MAIL_USER, and MAIL_PASS environment variables.');
-        // ダミートランスポーターを返す
-        transporter = {
-          sendMail: async (options: any) => {
-            console.log('Email would be sent (SMTP not configured):', options);
-            return { messageId: 'dummy-smtp-' + Date.now() };
-          },
-          verify: async () => true,
-          close: async () => {},
-        } as any;
+        transporter = createDummyTransporter('smtp-not-configured');
         return transporter;
       }
 
@@ -134,16 +148,23 @@ export function getEmailClient(): Transporter {
       break;
   }
 
-  // 接続テスト
-  transporter.verify((error) => {
-    if (error) {
-      console.error('Email client verification failed:', error);
-      console.error('Provider:', emailProvider);
-      transporter = null;
-    } else {
-      console.log(`Email client is ready to send messages via ${emailProvider}`);
-    }
-  });
+  // 接続テスト（非同期でバックグラウンドで実行）
+  if (transporter) {
+    transporter.verify((error) => {
+      if (error) {
+        console.error('Email client verification failed:', error);
+        console.error('Provider:', emailProvider);
+        // エラーの場合でもtransporterはnullにしない（接続は後で復活する可能性がある）
+      } else {
+        console.log(`Email client is ready to send messages via ${emailProvider}`);
+      }
+    });
+  }
+
+  // この時点でtransporterがnullの場合は、フォールバックのダミートランスポーターを作成
+  if (!transporter) {
+    transporter = createDummyTransporter('fallback');
+  }
 
   return transporter;
 }

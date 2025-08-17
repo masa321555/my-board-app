@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, Link, Section } from '@react-email/components';
+import { Text, Section } from '@react-email/components';
 import { Layout } from '../components/Layout';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';

@@ -1,6 +1,4 @@
-import type { NextAuthOptions } from 'next-auth';
-
-export const authConfig: Partial<NextAuthOptions> = {
+export const authConfig = {
   pages: {
     signIn: '/auth/signin',
     signOut: '/auth/signout',

@@ -62,7 +62,6 @@ export default function BoardPage() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -84,7 +83,7 @@ export default function BoardPage() {
       if (abortControllerRef.current) {
         try {
           abortControllerRef.current.abort();
-        } catch (error) {
+        } catch (_error) {
           // AbortErrorは無視
         }
       }
@@ -120,7 +119,7 @@ export default function BoardPage() {
   }, [searchParams, safeSetState]);
 
   // 投稿取得関数（メモ化しない）
-  const fetchPosts = async (forceRefresh = false) => {
+  const fetchPosts = async (_forceRefresh = false) => {
     if (!mountedRef.current) return;
     
     // 前のリクエストをキャンセル
@@ -134,9 +133,6 @@ export default function BoardPage() {
     safeSetState(() => {
       setLoading(true);
       setError('');
-      if (forceRefresh) {
-        setIsRefreshing(true);
-      }
     });
 
     try {
@@ -169,7 +165,6 @@ export default function BoardPage() {
     } finally {
       safeSetState(() => {
         setLoading(false);
-        setIsRefreshing(false);
       });
     }
   };
@@ -187,26 +182,6 @@ export default function BoardPage() {
       setPagination(prev => ({ ...prev, page: value }));
     });
   }, [safeSetState]);
-
-  const handleNavigation = useCallback((path: string) => {
-    if (mountedRef.current && !isNavigating) {
-      safeSetState(() => {
-        setIsNavigating(true);
-      });
-      
-      setTimeout(() => {
-        if (mountedRef.current) {
-          try {
-            router.push(path);
-          } catch (navError) {
-            console.error('Navigation error:', navError);
-            // フォールバック: 手動でページをリロード
-            window.location.href = path;
-          }
-        }
-      }, 1000);
-    }
-  }, [isNavigating, safeSetState, router]);
 
   const handleDeleteCancel = useCallback(() => {
     if (mountedRef.current && !isDeleting) {
@@ -416,7 +391,7 @@ export default function BoardPage() {
                 >
                   詳細を見る
                 </Button>
-                {session?.user?.id === post.author._id && (
+                {(session?.user as any)?.id === post.author._id && (
                   <Box>
                     <IconButton
                       size="small"

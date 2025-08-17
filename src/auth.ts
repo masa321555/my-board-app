@@ -18,6 +18,7 @@ async function getUser(email: string): Promise<any | undefined> {
   }
 }
 
+// @ts-expect-error - NextAuth call signature issue
 export const { auth, signIn, signOut, handlers } = NextAuth({
   ...authConfig,
   secret: process.env.NEXTAUTH_SECRET,
@@ -66,7 +67,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: any) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
@@ -74,7 +75,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: any) {
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
@@ -82,7 +83,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       }
       return session;
     },
-    async redirect({ url, baseUrl }) {
+    async redirect({ url, baseUrl }: any) {
       // ログイン後にダッシュボードにリダイレクト
       if (url.startsWith('/auth/signin') || url.startsWith('/auth/verify-email')) {
         return `${baseUrl}/dashboard`;

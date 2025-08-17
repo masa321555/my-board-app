@@ -22,7 +22,7 @@ export class SendGridEmailService {
     await sgMail.send(msg);
   }
 
-  private async loadTemplate(templateName: string, data: Record<string, any>): Promise<string> {
+  private async loadTemplate(_templateName: string, _data: Record<string, any>): Promise<string> {
     // 既存のテンプレートロジックを再利用
     return '';
   }
