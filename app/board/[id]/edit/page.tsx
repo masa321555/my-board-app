@@ -169,6 +169,9 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
     }
   }, [isSaving, isNavigating, safeSetState]);
 
+  // 動的キー生成（より安定したキー）
+  const dynamicKey = useRef(Date.now()).current;
+
   if (status === 'loading' || isLoading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
@@ -192,9 +195,6 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
       </Container>
     );
   }
-
-  // 動的キー生成（より安定したキー）
-  const dynamicKey = useRef(Date.now()).current;
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>

@@ -202,6 +202,9 @@ export default function RegisterForm() {
     }
   }, [showConfirmPassword, isSubmitting, isNavigating, safeSetState]);
 
+  // 動的キー生成（より安定したキー）
+  const dynamicKey = useRef(Date.now()).current;
+
   // マウント前またはナビゲーション中はローディング表示
   if (!mounted || isNavigating) {
     return (
@@ -222,9 +225,6 @@ export default function RegisterForm() {
       </Paper>
     );
   }
-
-  // 動的キー生成（より安定したキー）
-  const dynamicKey = useRef(Date.now()).current;
 
   return (
     <Paper elevation={3} sx={{ padding: 4, width: '100%' }}>

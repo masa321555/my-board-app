@@ -115,6 +115,9 @@ export default function ForgotPasswordPage() {
     isSubmitting.current = false;
   }, [email, safeSetState]);
 
+  // 動的キー生成（より安定したキー）
+  const dynamicKey = useRef(Date.now()).current;
+
   // マウント前またはナビゲーション中はローディング表示
   if (!mounted) {
     return (
@@ -136,9 +139,6 @@ export default function ForgotPasswordPage() {
       </Container>
     );
   }
-
-  // 動的キー生成（より安定したキー）
-  const dynamicKey = useRef(Date.now()).current;
 
   return (
     <Container component="main" maxWidth="xs">

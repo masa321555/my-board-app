@@ -141,6 +141,9 @@ function SignInContent() {
     }
   }, [isLoading, isNavigating, safeSetState]);
 
+  // 動的キー生成（より安定したキー）
+  const dynamicKey = useRef(Date.now()).current;
+
   // マウント前またはナビゲーション中はローディング表示
   if (!mounted || isNavigating) {
     return (
@@ -162,9 +165,6 @@ function SignInContent() {
       </Container>
     );
   }
-
-  // 動的キー生成（より安定したキー）
-  const dynamicKey = useRef(Date.now()).current;
 
   return (
     <Container component="main" maxWidth="xs">
