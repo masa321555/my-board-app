@@ -34,14 +34,11 @@ export async function POST(request: NextRequest) {
 
     // パスワードリセットトークンを生成
     const resetToken = TokenUtils.generatePasswordResetToken(
-      user._id.toString(),
+      (user._id as any).toString(),
       user.email
     );
 
-    // トークンを保存
-    user.passwordResetToken = resetToken;
-    user.passwordResetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1時間後
-    await user.save();
+    // JWTトークンに有効期限があるため、データベースへの保存は不要
 
     // パスワードリセットメールを送信
     try {

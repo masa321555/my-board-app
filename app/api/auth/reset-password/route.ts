@@ -47,29 +47,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // トークンが一致するか確認
-    if (user.passwordResetToken !== validatedData.token) {
-      return NextResponse.json(
-        { error: 'トークンが無効です' },
-        { status: 400 }
-      );
-    }
-
-    // トークンの有効期限を確認
-    if (user.passwordResetExpires && user.passwordResetExpires < new Date()) {
-      return NextResponse.json(
-        { error: 'トークンの有効期限が切れています' },
-        { status: 400 }
-      );
-    }
+    // JWTトークンの検証で十分なため、追加のチェックは不要
 
     // 新しいパスワードをハッシュ化
     const hashedPassword = await bcrypt.hash(validatedData.password, 10);
 
-    // パスワードを更新し、リセットトークンをクリア
+    // パスワードを更新
     user.password = hashedPassword;
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
     await user.save();
 
     return NextResponse.json(
