@@ -1,105 +1,110 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Link from 'next/link';
+import { registerSchema, type RegisterFormData } from '@/schemas/auth';
+import { checkPasswordStrength } from '@/utils/passwordStrength';
 import {
-  Box,
   TextField,
   Button,
   Typography,
   Alert,
-  Paper,
+  Box,
   CircularProgress,
   InputAdornment,
   IconButton,
   LinearProgress,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Collapse,
 } from '@mui/material';
-import {
-  Visibility,
-  VisibilityOff,
-  CheckCircle,
-  Cancel,
-  Info,
-} from '@mui/icons-material';
-import { registerSchema, RegisterFormData } from '@/schemas/auth';
-import { checkPasswordStrength, getPasswordStrengthColor } from '@/utils/passwordStrength';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import Link from 'next/link';
 
 export default function RegisterForm() {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
   const [serverError, setServerError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
-  const isSubmittingRef = useRef(false);
-  const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const mountedRef = useRef(false);
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
     feedback: '',
     suggestions: [] as string[],
     isStrong: false,
   });
+  
+  const mountedRef = useRef(false);
+  const isSubmittingRef = useRef(false);
+  const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // マウント状態の管理
   useEffect(() => {
     mountedRef.current = true;
-    setMounted(true);
     return () => {
       mountedRef.current = false;
-      setMounted(false);
       if (navigationTimeoutRef.current) {
         clearTimeout(navigationTimeoutRef.current);
-        navigationTimeoutRef.current = null;
       }
     };
   }, []);
 
-  // 安全な状態更新関数
-  const safeSetState = useCallback((setter: () => void) => {
+  const safeSetState = useCallback((updater: () => void) => {
     if (mountedRef.current) {
-      setter();
+      updater();
     }
   }, []);
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
     watch,
-    trigger,
+    formState: { errors },
+    setError,
+    clearErrors,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     mode: 'onChange',
   });
 
-  const watchPassword = watch('password');
+  const watchedPassword = watch('password', '');
+  const watchedConfirmPassword = watch('confirmPassword', '');
 
-  // パスワード変更時に強度をチェック
-  const handlePasswordChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!mountedRef.current || isSubmitting || isNavigating) return;
+  // パスワード強度チェック
+  useEffect(() => {
+    if (!mountedRef.current) return;
     
-    const password = e.target.value;
-    const strength = checkPasswordStrength(password);
-    safeSetState(() => {
-      setPasswordStrength(strength);
-    });
-    
-    // パスワードフィールドのバリデーションをトリガー
-    if (password.length >= 8) {
-      await trigger('password');
+    if (watchedPassword) {
+      const strength = checkPasswordStrength(watchedPassword);
+      safeSetState(() => {
+        setPasswordStrength(strength);
+      });
+    } else {
+      safeSetState(() => {
+        setPasswordStrength({
+          score: 0,
+          feedback: '',
+          suggestions: [],
+          isStrong: false,
+        });
+      });
     }
-  }, [isSubmitting, isNavigating, trigger, safeSetState]);
+  }, [watchedPassword, safeSetState]);
+
+  // パスワード確認の一致チェック
+  useEffect(() => {
+    if (!mountedRef.current) return;
+    
+    if (watchedConfirmPassword && watchedPassword !== watchedConfirmPassword) {
+      setError('confirmPassword', {
+        type: 'manual',
+        message: 'パスワードが一致しません',
+      });
+    } else if (watchedConfirmPassword) {
+      clearErrors('confirmPassword');
+    }
+  }, [watchedPassword, watchedConfirmPassword, setError, clearErrors]);
 
   const onSubmit = useCallback(async (data: RegisterFormData) => {
     if (!mountedRef.current || isSubmittingRef.current || isNavigating) return;
@@ -123,7 +128,7 @@ export default function RegisterForm() {
         name: data.name,
         email: data.email,
         password: data.password,
-        confirmPassword: data.confirmPassword, // 明示的に追加
+        confirmPassword: data.confirmPassword,
       };
       
       console.log('APIリクエスト送信:', requestBody);
@@ -144,32 +149,30 @@ export default function RegisterForm() {
       const result = await response.json();
       console.log('APIレスポンス内容:', result);
 
-              if (!response.ok) {
-          if (mountedRef.current) {
-            if (result.details) {
-              // パスワード強度エラーの場合
-              safeSetState(() => {
-                setServerError(result.error);
-                if (result.details.suggestions) {
-                  setPasswordStrength({
-                    ...passwordStrength,
-                    suggestions: result.details.suggestions,
-                  });
-                }
-              });
-            } else {
-              safeSetState(() => {
-                setServerError(result.error || '登録に失敗しました');
-              });
-            }
-            // エラー時はisSubmittingをfalseに設定
+      if (!response.ok) {
+        if (mountedRef.current) {
+          if (result.details) {
             safeSetState(() => {
-              setIsSubmitting(false);
+              setServerError(result.error);
+              if (result.details.suggestions) {
+                setPasswordStrength({
+                  ...passwordStrength,
+                  suggestions: result.details.suggestions,
+                });
+              }
             });
-            isSubmittingRef.current = false;
+          } else {
+            safeSetState(() => {
+              setServerError(result.error || '登録に失敗しました');
+            });
           }
-          return;
+          safeSetState(() => {
+            setIsSubmitting(false);
+          });
+          isSubmittingRef.current = false;
         }
+        return;
+      }
 
       if (mountedRef.current) {
         safeSetState(() => {
@@ -177,20 +180,16 @@ export default function RegisterForm() {
           setIsNavigating(true);
         });
         
-        // より長い遅延を入れてからリダイレクト
         navigationTimeoutRef.current = setTimeout(() => {
           if (mountedRef.current && !isNavigating) {
             try {
-              // より安全なリダイレクト方法
               router.push('/auth/signin');
             } catch (navError) {
               console.error('Navigation error:', navError);
-              // フォールバック: 再度router.pushを試行
               try {
                 router.push('/auth/signin');
               } catch (fallbackError) {
                 console.error('Fallback navigation error:', fallbackError);
-                // 最後の手段としてwindow.locationを使用
                 if (mountedRef.current && !isNavigating) {
                   window.location.href = '/auth/signin';
                 }
@@ -198,7 +197,7 @@ export default function RegisterForm() {
             }
           }
         }, 3000);
-        return; // 早期リターンで処理を終了
+        return;
       }
     } catch (error) {
       console.error('Registration error:', error);
@@ -209,7 +208,6 @@ export default function RegisterForm() {
       }
     }
     
-    // エラー時のみここに到達
     if (mountedRef.current) {
       safeSetState(() => {
         setIsSubmitting(false);
@@ -221,233 +219,186 @@ export default function RegisterForm() {
   const handlePasswordToggle = useCallback(() => {
     if (mountedRef.current && !isSubmitting && !isNavigating) {
       safeSetState(() => {
-        setShowPassword(!showPassword);
+        setShowPassword(prev => !prev);
       });
     }
-  }, [showPassword, isSubmitting, isNavigating, safeSetState]);
+  }, [isSubmitting, isNavigating, safeSetState]);
 
   const handleConfirmPasswordToggle = useCallback(() => {
     if (mountedRef.current && !isSubmitting && !isNavigating) {
       safeSetState(() => {
-        setShowConfirmPassword(!showConfirmPassword);
+        setShowConfirmPassword(prev => !prev);
       });
     }
-  }, [showConfirmPassword, isSubmitting, isNavigating, safeSetState]);
-
-  // 動的キー生成（より安定したキー）
-  const dynamicKey = useRef(Date.now()).current;
+  }, [isSubmitting, isNavigating, safeSetState]);
 
   // マウント前またはナビゲーション中はローディング表示
-  if (!mounted || isNavigating) {
+  if (!mountedRef.current || isNavigating) {
     return (
-      <Paper elevation={3} sx={{ padding: 4, width: '100%' }}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            minHeight: '60vh',
-          }}
-        >
-          <CircularProgress />
-          <Typography variant="body2" sx={{ mt: 2 }}>
-            {isNavigating ? '登録完了、ログインページへ移動中...' : '読み込み中...'}
-          </Typography>
-        </Box>
-      </Paper>
+      <Box sx={{ textAlign: 'center', py: 4 }}>
+        <CircularProgress />
+        <Typography variant="body2" sx={{ mt: 2 }}>
+          {isNavigating ? '登録完了、ログインページへ移動中...' : '読み込み中...'}
+        </Typography>
+      </Box>
     );
   }
 
   return (
-    <Paper elevation={3} sx={{ padding: 4, width: '100%' }}>
-      <Typography component="h1" variant="h5" align="center">
-        新規登録
-      </Typography>
-      
-      <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3 }}>
-        <Alert 
-          severity="error" 
-          sx={{ mb: 2, display: serverError ? 'flex' : 'none' }} 
-          key={`error-${dynamicKey}`}
-        >
+    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3 }}>
+      {serverError && (
+        <Alert severity="error" sx={{ mb: 2 }}>
           {serverError}
         </Alert>
-        
-        <Alert 
-          severity="success" 
-          sx={{ mb: 2, display: successMessage ? 'flex' : 'none' }} 
-          key={`success-${dynamicKey}`}
-        >
+      )}
+      
+      {successMessage && (
+        <Alert severity="success" sx={{ mb: 2 }}>
           {successMessage}
         </Alert>
-        
-        <TextField
-          {...register('name')}
-          margin="normal"
-          required
-          fullWidth
-          id="name"
-          label="お名前"
-          autoComplete="name"
-          autoFocus
-          error={!!errors.name}
-          helperText={errors.name?.message}
-          disabled={isSubmitting || !!successMessage}
-          key={`name-${dynamicKey}`}
-        />
-        
-        <TextField
-          {...register('email')}
-          margin="normal"
-          required
-          fullWidth
-          id="email"
-          label="メールアドレス"
-          autoComplete="email"
-          error={!!errors.email}
-          helperText={errors.email?.message}
-          disabled={isSubmitting || !!successMessage}
-          key={`email-${dynamicKey}`}
-        />
-        
-        <TextField
-          {...register('password', {
-            onChange: handlePasswordChange,
-          })}
-          margin="normal"
-          required
-          fullWidth
-          label="パスワード"
-          type={showPassword ? 'text' : 'password'}
-          id="password"
-          autoComplete="new-password"
-          error={!!errors.password}
-          helperText={errors.password?.message || 'パスワードは8文字以上で設定してください'}
-          disabled={isSubmitting || !!successMessage}
-          key={`password-${dynamicKey}`}
-          InputProps={{
+      )}
+      
+      <TextField
+        margin="normal"
+        required
+        fullWidth
+        id="name"
+        label="お名前"
+        autoComplete="name"
+        {...register('name')}
+        error={!!errors.name}
+        helperText={errors.name?.message}
+        disabled={isSubmitting}
+      />
+      
+      <TextField
+        margin="normal"
+        required
+        fullWidth
+        id="email"
+        label="メールアドレス"
+        type="email"
+        autoComplete="email"
+        {...register('email')}
+        error={!!errors.email}
+        helperText={errors.email?.message}
+        disabled={isSubmitting}
+      />
+      
+      <TextField
+        margin="normal"
+        required
+        fullWidth
+        label="パスワード"
+        type={showPassword ? 'text' : 'password'}
+        id="password"
+        autoComplete="new-password"
+        {...register('password')}
+        error={!!errors.password}
+        helperText={errors.password?.message || 'パスワードは8文字以上で設定してください'}
+        disabled={isSubmitting}
+        slotProps={{
+          input: {
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
                   aria-label="toggle password visibility"
                   onClick={handlePasswordToggle}
                   edge="end"
-                  disabled={isSubmitting || !!successMessage}
+                  disabled={isSubmitting}
                 >
                   {showPassword ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
               </InputAdornment>
             ),
-          }}
-        />
-
-        {/* パスワード強度メーター */}
-        {watchPassword && (
-          <Box sx={{ mt: 1, mb: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-              <Typography variant="caption" sx={{ mr: 1 }}>
-                パスワード強度:
-              </Typography>
-              <Typography 
-                variant="caption" 
-                sx={{ 
-                  color: getPasswordStrengthColor(passwordStrength.score),
-                  fontWeight: 'bold' 
-                }}
-              >
-                {passwordStrength.feedback}
-              </Typography>
-            </Box>
-            <LinearProgress
-              variant="determinate"
-              value={(passwordStrength.score / 4) * 100}
-              sx={{
-                height: 8,
-                borderRadius: 5,
-                backgroundColor: '#e0e0e0',
-                '& .MuiLinearProgress-bar': {
-                  borderRadius: 5,
-                  backgroundColor: getPasswordStrengthColor(passwordStrength.score),
-                },
-              }}
-            />
-            
-            {/* 提案表示 */}
-            <Collapse in={passwordStrength.suggestions.length > 0}>
-              <List dense sx={{ mt: 1 }}>
-                {passwordStrength.suggestions.map((suggestion, index) => (
-                  <ListItem key={index} sx={{ py: 0 }}>
-                    <ListItemIcon sx={{ minWidth: 30 }}>
-                      <Info fontSize="small" color="info" />
-                    </ListItemIcon>
-                    <ListItemText 
-                      primary={suggestion} 
-                      primaryTypographyProps={{ variant: 'caption' }}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            </Collapse>
-          </Box>
-        )}
-        
-        <TextField
-          {...register('confirmPassword')}
-          margin="normal"
-          required
-          fullWidth
-          label="パスワード（確認）"
-          type={showConfirmPassword ? 'text' : 'password'}
-          id="confirmPassword"
-          autoComplete="new-password"
-          error={!!errors.confirmPassword}
-          helperText={errors.confirmPassword?.message}
-          disabled={isSubmitting || !!successMessage}
-          key={`confirmPassword-${dynamicKey}`}
-          InputProps={{
+          },
+        }}
+      />
+      
+      {/* パスワード強度インジケーター */}
+      {watchedPassword && (
+        <Box sx={{ mt: 1, mb: 2 }}>
+          <Typography variant="body2" color="text.secondary">
+            パスワード強度: {passwordStrength.feedback}
+          </Typography>
+          <LinearProgress
+            variant="determinate"
+            value={(passwordStrength.score / 4) * 100}
+            sx={{
+              mt: 0.5,
+              height: 8,
+              borderRadius: 4,
+              backgroundColor: 'grey.200',
+              '& .MuiLinearProgress-bar': {
+                backgroundColor: passwordStrength.isStrong ? 'success.main' : 'warning.main',
+              },
+            }}
+          />
+          {passwordStrength.suggestions.length > 0 && (
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+              提案: {passwordStrength.suggestions.join(', ')}
+            </Typography>
+          )}
+        </Box>
+      )}
+      
+      <TextField
+        margin="normal"
+        required
+        fullWidth
+        label="パスワード（確認）"
+        type={showConfirmPassword ? 'text' : 'password'}
+        id="confirmPassword"
+        autoComplete="new-password"
+        {...register('confirmPassword')}
+        error={!!errors.confirmPassword}
+        helperText={errors.confirmPassword?.message}
+        disabled={isSubmitting}
+        slotProps={{
+          input: {
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
-                  aria-label="toggle password visibility"
+                  aria-label="toggle confirm password visibility"
                   onClick={handleConfirmPasswordToggle}
                   edge="end"
-                  disabled={isSubmitting || !!successMessage}
+                  disabled={isSubmitting}
                 >
                   {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
               </InputAdornment>
             ),
-          }}
-        />
-        
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          sx={{ mt: 3, mb: 2 }}
-          disabled={isSubmitting || !!successMessage}
-        >
-          {isSubmitting ? (
-            <>
-              <CircularProgress size={20} sx={{ mr: 1 }} />
-              登録処理中...
-            </>
-          ) : (
-            '登録する'
-          )}
-        </Button>
-        
-        <Box sx={{ textAlign: 'center' }}>
-          <Typography variant="body2">
-            既にアカウントをお持ちの方は
-            <Link href="/auth/signin" style={{ textDecoration: 'none' }}>
-              <Typography component="span" color="primary" sx={{ ml: 0.5 }}>
-                ログイン
-              </Typography>
-            </Link>
-          </Typography>
-        </Box>
+          },
+        }}
+      />
+      
+      <Button
+        type="submit"
+        fullWidth
+        variant="contained"
+        sx={{ mt: 3, mb: 2 }}
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? (
+          <>
+            <CircularProgress size={20} sx={{ mr: 1 }} />
+            登録中...
+          </>
+        ) : (
+          '登録する'
+        )}
+      </Button>
+      
+      <Box sx={{ textAlign: 'center' }}>
+        <Typography variant="body2">
+          既にアカウントをお持ちの方は
+          <Link href="/auth/signin" style={{ textDecoration: 'none' }}>
+            <Typography component="span" color="primary" sx={{ ml: 0.5 }}>
+              ログイン
+            </Typography>
+          </Link>
+        </Typography>
       </Box>
-    </Paper>
+    </Box>
   );
 }
