@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/db';
+import dbConnect from '@/lib/mongodb';
 import User from '@/models/User.model';
 import { TokenUtils } from '@/utils/tokenUtils';
 import { emailService } from '@/lib/email/service';
@@ -17,9 +17,15 @@ export async function GET(request: NextRequest) {
     }
 
     // トークンを検証
-    const decoded = TokenUtils.verifyEmailConfirmationToken(token);
-    
-    if (!decoded) {
+    let decoded;
+    try {
+      decoded = TokenUtils.verifyToken(token);
+      
+      // メール確認トークンであることを確認
+      if (decoded.type !== 'email-confirmation') {
+        throw new Error('Invalid token type');
+      }
+    } catch (error) {
       return NextResponse.json(
         { error: '無効または期限切れのトークンです' },
         { status: 400 }

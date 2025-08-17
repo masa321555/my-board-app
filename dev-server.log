@@ -4133,3 +4133,8 @@ Error: Route "/api/user/dashboard" used `cookies().getAll()`. `cookies()` should
  ✓ Compiled /_not-found/page in 738ms
  GET /api/posts?page=1&limit=10 404 in 924ms
  ✓ Compiled in 161ms
+ GET / 200 in 609ms
+[Error: Route "/api/auth/[...nextauth]" used `params.nextauth`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `cookies().getAll()`. `cookies()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/api/auth/[...nextauth]" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /api/auth/session 200 in 359ms
