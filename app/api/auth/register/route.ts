@@ -9,20 +9,32 @@ import { registerSchema } from '@/schemas/auth';
 import { checkPasswordStrength } from '@/utils/passwordStrength';
 
 export async function POST(request: NextRequest) {
+  console.log('=== 登録API開始 ===');
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+  console.log('MONGODB_URI 設定:', !!process.env.MONGODB_URI);
+  console.log('JWT_SECRET 設定:', !!process.env.JWT_SECRET);
+  console.log('APP_URL:', process.env.APP_URL);
+  console.log('VERCEL_URL:', process.env.VERCEL_URL);
+  console.log('EMAIL_PROVIDER:', process.env.EMAIL_PROVIDER);
+  
   try {
     const body = await request.json();
     
     console.log('登録リクエスト受信:', { 
       name: body.name, 
       email: body.email, 
-      passwordLength: body.password?.length 
+      passwordLength: body.password?.length,
+      confirmPasswordLength: body.confirmPassword?.length,
+      hasConfirmPassword: !!body.confirmPassword
     });
     
     // バリデーション
     const validatedData = registerSchema.parse(body);
     console.log('バリデーション成功');
 
+    console.log('MongoDB接続開始...');
     await dbConnect();
+    console.log('MongoDB接続成功');
 
     // 既存ユーザーチェック（一時的に無効化）
     const existingUser = await User.findOne({ email: validatedData.email });
@@ -76,7 +88,10 @@ export async function POST(request: NextRequest) {
 
     // 確認メールを送信
     try {
-      const verificationUrl = `${process.env.APP_URL}/api/auth/verify?token=${confirmationToken}`;
+      // APP_URLが未設定の場合のフォールバック
+      const appUrl = process.env.APP_URL || 
+        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+      const verificationUrl = `${appUrl}/api/auth/verify?token=${confirmationToken}`;
       
       // 開発環境ではメール送信をスキップ
       if (isDevelopment) {
@@ -91,6 +106,7 @@ export async function POST(request: NextRequest) {
     } catch (emailError) {
       console.error('確認メール送信エラー:', emailError);
       // メール送信に失敗してもユーザー登録は成功とする
+      console.log('メール送信は失敗しましたが、ユーザー登録は継続します');
     }
 
     return NextResponse.json(
@@ -121,7 +137,42 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    console.error('ユーザー登録エラー:', error);
+    // 詳細なエラー情報をログに出力
+    let errorMessage = 'ユーザー登録に失敗しました';
+    let errorDetails: any = {};
+    
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      errorDetails.stack = error.stack;
+      
+      // MongoDB接続エラーの場合
+      if (error.message.includes('MONGODB_URI')) {
+        errorMessage = 'データベース接続エラー';
+        errorDetails.type = 'DATABASE_CONNECTION_ERROR';
+      }
+      // メール設定エラーの場合
+      else if (error.message.includes('credentials not configured')) {
+        errorMessage = 'メール設定エラー';
+        errorDetails.type = 'EMAIL_CONFIGURATION_ERROR';
+      }
+    }
+    
+    console.error('エラータイプ:', errorDetails.type || 'UNKNOWN');
+    console.error('エラーメッセージ:', errorMessage);
+    console.error('スタックトレース:', errorDetails.stack);
+    
+    // 開発環境では詳細なエラーを返す
+    if (process.env.NODE_ENV === 'development') {
+      return NextResponse.json(
+        { 
+          error: errorMessage,
+          details: errorDetails
+        },
+        { status: 500 }
+      );
+    }
+    
+    // 本番環境では一般的なエラーメッセージを返す
     return NextResponse.json(
       { error: 'ユーザー登録に失敗しました' },
       { status: 500 }
