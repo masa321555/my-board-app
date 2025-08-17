@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
   try {
     switch (template) {
       case 'welcome':
-        html = render(WelcomeEmail({
+        html = await render(WelcomeEmail({
           name: '山田太郎',
           email: 'yamada@example.com',
           loginUrl: 'http://localhost:3000/auth/signin',
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
         break;
         
       case 'verification':
-        html = render(VerificationEmail({
+        html = await render(VerificationEmail({
           name: '山田太郎',
           verificationUrl: 'http://localhost:3000/auth/verify?token=example-token',
           expiresIn: '24時間',
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
         break;
         
       case 'password-reset':
-        html = render(PasswordResetEmail({
+        html = await render(PasswordResetEmail({
           name: '山田太郎',
           resetUrl: 'http://localhost:3000/auth/reset-password?token=example-token',
           expiresIn: '1時間',
