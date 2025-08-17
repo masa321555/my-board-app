@@ -19,7 +19,7 @@ export const registerSchema = z.object({
     .refine((password) => {
       const strength = checkPasswordStrength(password);
       return strength.isStrong;
-    }, 'パスワードが弱すぎます。より強力なパスワードを設定してください'),
+    }, 'パスワードが弱すぎます。8文字以上で、より強力なパスワードを設定してください'),
   confirmPassword: z
     .string()
     .min(1, 'パスワード（確認）を入力してください'),

@@ -27,9 +27,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // パスワード強度をチェック
+    // パスワード強度をチェック（開発環境では緩和）
     const passwordStrength = checkPasswordStrength(validatedData.password);
-    if (!passwordStrength.isStrong) {
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    
+    if (!passwordStrength.isStrong && !isDevelopment) {
       return NextResponse.json(
         { 
           error: 'パスワードが弱すぎます',
@@ -46,7 +48,6 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(validatedData.password, 12);
 
     // ユーザーを作成（開発環境ではemailVerifiedをtrueに設定）
-    const isDevelopment = process.env.NODE_ENV === 'development';
     const user = await User.create({
       email: validatedData.email,
       password: hashedPassword,

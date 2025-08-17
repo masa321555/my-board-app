@@ -78,7 +78,7 @@ export function checkPasswordStrength(password: string): PasswordStrength {
     score: result.score,
     feedback: feedbackMap[result.score],
     suggestions,
-    isStrong: result.score >= 3 && password.length >= 8,
+    isStrong: result.score >= 1 && password.length >= 8,
   };
 }
 
