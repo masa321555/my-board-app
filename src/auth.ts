@@ -1,6 +1,4 @@
-import NextAuth from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
-import { authConfig } from './auth.config';
+import CredentialsProvider from 'next-auth/providers/credentials';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/mongodb';
@@ -18,9 +16,7 @@ async function getUser(email: string): Promise<any | undefined> {
   }
 }
 
-// @ts-expect-error - NextAuth call signature issue
-export const { auth, signIn, signOut, handlers } = NextAuth({
-  ...authConfig,
+export const authOptions: any = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: 'jwt',
@@ -33,7 +29,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     // verifyRequest: '/auth/verify-email',
   },
   providers: [
-    Credentials({
+    CredentialsProvider({
       credentials: {
         email: { label: 'メールアドレス', type: 'email' },
         password: { label: 'パスワード', type: 'password' },
@@ -76,7 +72,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       return token;
     },
     async session({ session, token }: any) {
-      if (token && session.user) {
+      if (session?.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
         session.user.emailVerified = (token.emailVerified as boolean) ?? true;
@@ -91,4 +87,4 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       return url;
     },
   },
-});
+};

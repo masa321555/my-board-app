@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/src/auth';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/src/auth';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
 
 // プロフィール取得
 export async function GET(_request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getServerSession(authOptions) as any;
     
     if (!(session?.user as any)?.id) {
       return NextResponse.json(
@@ -49,7 +50,7 @@ export async function GET(_request: NextRequest) {
 // プロフィール更新
 export async function PUT(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getServerSession(authOptions) as any;
     
     if (!(session?.user as any)?.id) {
       return NextResponse.json(

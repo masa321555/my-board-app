@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/src/auth';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/src/auth';
 import dbConnect from '@/lib/mongodb';
 import Post from '@/models/Post';
 import { z } from 'zod';
@@ -17,7 +18,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const session = await auth();
+    const session = await getServerSession(authOptions) as any;
     
     if (!session?.user) {
       return NextResponse.json(
@@ -56,7 +57,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const session = await auth();
+    const session = await getServerSession(authOptions) as any;
     
     if (!session?.user) {
       return NextResponse.json(
@@ -124,7 +125,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const session = await auth();
+    const session = await getServerSession(authOptions) as any;
     
     if (!session?.user) {
       return NextResponse.json(

@@ -1,5 +1,0 @@
-src/app.backup
-**/*.backup
-**/backup/**
-.next
-node_modules

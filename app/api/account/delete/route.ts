@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/src/auth';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/src/auth';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User.model';
@@ -8,7 +9,7 @@ import Post from '@/models/Post';
 export async function DELETE(request: NextRequest) {
   try {
     // セッションを確認
-    const session = await auth();
+    const session = await getServerSession(authOptions) as any;
     
     if (!(session?.user as any)?.id) {
       return NextResponse.json(

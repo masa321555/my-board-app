@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/src/auth';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/src/auth';
 import { emailService } from '@/lib/email/service';
 import { z } from 'zod';
 
@@ -13,7 +14,7 @@ const sendEmailSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // 認証チェック（管理者のみ送信可能にする場合）
-    const session = await auth();
+    const session = await getServerSession(authOptions) as any;
     
     if (!session) {
       return NextResponse.json(

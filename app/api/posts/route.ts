@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/src/auth';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/src/auth';
 import dbConnect from '@/lib/mongodb';
 import Post from '@/models/Post';
 import { z } from 'zod';
@@ -13,7 +14,7 @@ const createPostSchema = z.object({
 // GET /api/posts - 投稿一覧を取得
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getServerSession(authOptions) as any;
     
     if (!session?.user) {
       return NextResponse.json(
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest) {
 // POST /api/posts - 新規投稿を作成
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getServerSession(authOptions) as any;
     
     if (!session?.user) {
       return NextResponse.json(

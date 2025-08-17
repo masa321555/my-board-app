@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/src/auth';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/src/auth';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
 import { processImage } from '@/lib/imageUtils';
@@ -11,7 +12,7 @@ import { existsSync, mkdirSync } from 'fs';
 // アバター画像のアップロード
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getServerSession(authOptions) as any;
     
     if (!(session?.user as any)?.id) {
       return NextResponse.json(
@@ -125,7 +126,7 @@ export async function POST(request: NextRequest) {
 // アバター画像の削除
 export async function DELETE(_request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getServerSession(authOptions) as any;
     
     if (!(session?.user as any)?.id) {
       return NextResponse.json(

@@ -1,9 +1,10 @@
-import { auth } from '@/src/auth';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/src/auth';
 import { redirect } from 'next/navigation';
 
 // セッション取得
 export async function getSession() {
-  return await auth();
+  return await getServerSession(authOptions) as any;
 }
 
 // 認証必須ページ用

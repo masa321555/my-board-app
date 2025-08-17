@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/src/auth';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/src/auth';
 import dbConnect from '@/lib/mongodb';
 import Post from '@/models/Post';
 
 export async function GET(_request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getServerSession(authOptions) as any;
     
     if (!(session?.user as any)?.id) {
       return NextResponse.json(
