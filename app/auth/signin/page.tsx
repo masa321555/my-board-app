@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useCallback, Suspense, useEffect, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { signIn, useSession } from 'next-auth/react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
-import Link from 'next/link';
 import {
   Container,
   Box,
@@ -17,6 +16,8 @@ import {
   IconButton,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
 function SignInContent() {
   const searchParams = useSearchParams();
@@ -27,34 +28,28 @@ function SignInContent() {
     email: '',
     password: '',
   });
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
-  const isSubmitting = useRef(false);
-  const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   const mountedRef = useRef(false);
+  const isSubmittingRef = useRef(false);
+  const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // マウント状態の管理
   useEffect(() => {
     mountedRef.current = true;
-    setMounted(true);
-    
     return () => {
       mountedRef.current = false;
-      setMounted(false);
       if (navigationTimeoutRef.current) {
         clearTimeout(navigationTimeoutRef.current);
-        navigationTimeoutRef.current = null;
       }
     };
   }, []);
 
-  // 安全な状態更新関数
-  const safeSetState = useCallback((setter: () => void) => {
+  const safeSetState = useCallback((updater: () => void) => {
     if (mountedRef.current) {
-      setter();
+      updater();
     }
   }, []);
 
@@ -67,19 +62,23 @@ function SignInContent() {
         ...prev,
         [name]: value,
       }));
+      // エラーメッセージをクリア
+      if (error) {
+        setError('');
+      }
     });
-  }, [isLoading, isNavigating, safeSetState]);
+  }, [isLoading, isNavigating, error, safeSetState]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!mountedRef.current || isSubmitting.current || isLoading || isNavigating) return;
+    if (!mountedRef.current || isSubmittingRef.current || isLoading || isNavigating) return;
     
     safeSetState(() => {
       setError('');
       setIsLoading(true);
     });
-    isSubmitting.current = true;
+    isSubmittingRef.current = true;
 
     try {
       const result = await signIn('credentials', {
@@ -88,48 +87,43 @@ function SignInContent() {
         redirect: false,
       });
 
-      if (!mountedRef.current) return; // コンポーネントがアンマウントされた場合は何もしない
+      if (!mountedRef.current) return;
 
       if (result?.error) {
         safeSetState(() => {
           setError('メールアドレスまたはパスワードが正しくありません');
           setIsLoading(false);
         });
-        isSubmitting.current = false;
+        isSubmittingRef.current = false;
       } else if (result?.ok) {
         safeSetState(() => {
           setIsNavigating(true);
         });
         
-        // より長い遅延を入れてからリダイレクト
+        // ナビゲーション処理
         navigationTimeoutRef.current = setTimeout(() => {
           if (mountedRef.current && !isNavigating) {
             try {
-              // より安全なリダイレクト方法
               const url = decodeURIComponent(callbackUrl);
-              // 現在のドメインと同じ場合はrouter.pushを使用
               if (url.startsWith('/') || url.startsWith(window.location.origin)) {
                 router.push(url);
               } else {
-                // 外部URLの場合はwindow.locationを使用
                 window.location.href = url;
               }
             } catch (navError) {
               console.error('Navigation error:', navError);
-              // フォールバック: router.pushを使用
               try {
                 router.push(decodeURIComponent(callbackUrl));
               } catch (fallbackError) {
                 console.error('Fallback navigation error:', fallbackError);
-                // 最後の手段としてwindow.locationを使用
                 if (mountedRef.current && !isNavigating) {
                   window.location.href = decodeURIComponent(callbackUrl);
                 }
               }
             }
           }
-        }, 2000); // 遅延を2秒に延長
-        return; // 早期リターンで処理を終了
+        }, 2000);
+        return;
       }
     } catch (error) {
       console.error('Sign in error:', error);
@@ -138,18 +132,17 @@ function SignInContent() {
           setError('ログインに失敗しました');
           setIsLoading(false);
         });
-        isSubmitting.current = false;
+        isSubmittingRef.current = false;
       }
     }
     
-    // エラー時のみここに到達
     if (mountedRef.current) {
       safeSetState(() => {
         setIsLoading(false);
       });
-      isSubmitting.current = false;
+      isSubmittingRef.current = false;
     }
-  }, [formData, callbackUrl, isLoading, isNavigating, safeSetState]);
+  }, [formData, callbackUrl, isLoading, isNavigating, safeSetState, router]);
 
   const handlePasswordToggle = useCallback(() => {
     if (mountedRef.current && !isLoading && !isNavigating) {
@@ -159,11 +152,8 @@ function SignInContent() {
     }
   }, [isLoading, isNavigating, safeSetState]);
 
-  // 動的キー生成（より安定したキー）
-  const dynamicKey = useRef(Date.now()).current;
-
   // マウント前またはナビゲーション中はローディング表示
-  if (!mounted || isNavigating) {
+  if (!mountedRef.current || isNavigating) {
     return (
       <Container component="main" maxWidth="xs">
         <Box
@@ -201,11 +191,7 @@ function SignInContent() {
           
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
             {error && (
-              <Alert 
-                severity="error" 
-                sx={{ mb: 2 }} 
-                key={`error-${dynamicKey}`}
-              >
+              <Alert severity="error" sx={{ mb: 2 }}>
                 {error}
               </Alert>
             )}
@@ -222,7 +208,6 @@ function SignInContent() {
               value={formData.email}
               onChange={handleChange}
               disabled={isLoading}
-              key={`email-${dynamicKey}`}
             />
             
             <TextField
@@ -237,7 +222,6 @@ function SignInContent() {
               value={formData.password}
               onChange={handleChange}
               disabled={isLoading}
-              key={`password-${dynamicKey}`}
               slotProps={{
                 input: {
                   endAdornment: (
