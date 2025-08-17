@@ -5,6 +5,7 @@ export interface IPost extends Document {
   content: string;
   author: mongoose.Types.ObjectId;
   authorName: string;
+  views?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,6 +30,10 @@ const PostSchema = new Schema<IPost>({
   authorName: {
     type: String,
     required: true,
+  },
+  views: {
+    type: Number,
+    default: 0,
   },
 }, {
   timestamps: true,

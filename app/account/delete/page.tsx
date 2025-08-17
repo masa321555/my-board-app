@@ -22,20 +22,18 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
 } from '@mui/material';
 import {
   Warning as WarningIcon,
   Delete as DeleteIcon,
   Check as CheckIcon,
-  Close as CloseIcon,
 } from '@mui/icons-material';
 import ProtectedLayout from '@/components/ProtectedLayout';
 
 const steps = ['注意事項の確認', 'パスワードの確認', '最終確認'];
 
 export default function DeleteAccountPage() {
-  const { data: session } = useSession();
+  const { data: _session } = useSession();
   const router = useRouter();
   const [activeStep, setActiveStep] = useState(0);
   const [password, setPassword] = useState('');

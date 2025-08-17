@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       if (decoded.type !== 'email-confirmation') {
         throw new Error('Invalid token type');
       }
-    } catch (error) {
+    } catch (_error) {
       return NextResponse.json(
         { error: '無効または期限切れのトークンです' },
         { status: 400 }
