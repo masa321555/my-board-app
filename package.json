@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "build:vercel": "npm install --legacy-peer-deps --force --no-audit && next build",
+    "build:vercel": "npm install --legacy-peer-deps --no-audit && next build",
     "build:production": "NODE_ENV=production next build",
     "start": "next start",
     "start:production": "NODE_ENV=production next start",
@@ -77,6 +77,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/zxcvbn": "^4.4.5",
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
     "jest": "^30.0.5",

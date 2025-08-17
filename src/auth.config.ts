@@ -1,28 +1,13 @@
-import type { NextAuthConfig } from 'next-auth';
+import type { NextAuthOptions } from 'next-auth';
 
-export const authConfig = {
+export const authConfig: Partial<NextAuthOptions> = {
   pages: {
     signIn: '/auth/signin',
     signOut: '/auth/signout',
     error: '/auth/error',
     verifyRequest: '/auth/verify-request',
   },
-  callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
-      const isOnBoard = nextUrl.pathname.startsWith('/board');
-      const isOnAuth = nextUrl.pathname.startsWith('/auth');
-      
-      if (isOnBoard) {
-        if (isLoggedIn) return true;
-        return false; // Redirect unauthenticated users to login page
-      } else if (isLoggedIn && isOnAuth) {
-        return Response.redirect(new URL('/board', nextUrl));
-      }
-      
-      return true;
-    },
-  },
+  callbacks: {},
   providers: [], // Add providers with an empty array for now
   // セッション設定の最適化
   session: {
@@ -72,8 +57,6 @@ export const authConfig = {
   },
   // セキュリティ設定
   useSecureCookies: process.env.NODE_ENV === 'production',
-  // CSRF保護を有効化
-  csrfToken: true,
   // デバッグモード（開発環境のみ）
   debug: process.env.NODE_ENV === 'development',
-} satisfies NextAuthConfig;
+};

@@ -14,7 +14,6 @@ import {
   Divider,
   Skeleton,
 } from '@mui/material';
-import Grid from '@mui/material/Grid2';
 import {
   Dashboard as DashboardIcon,
   Article as ArticleIcon,
@@ -121,40 +120,43 @@ export default function DashboardPage() {
         </Box>
 
         {/* 統計カード */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid xs={12} sm={6} md={3}>
-            <StatCard
-              title="投稿数"
-              value={stats?.totalPosts || 0}
-              icon={<ArticleIcon />}
-              color="primary.main"
-            />
-          </Grid>
-          <Grid xs={12} sm={6} md={3}>
-            <StatCard
-              title="今週の投稿"
-              value={stats?.recentPosts || 0}
-              icon={<TrendingUpIcon />}
-              color="success.main"
-            />
-          </Grid>
-          <Grid xs={12} sm={6} md={3}>
-            <StatCard
-              title="コメント数"
-              value={stats?.totalComments || 0}
-              icon={<ForumIcon />}
-              color="info.main"
-            />
-          </Grid>
-          <Grid xs={12} sm={6} md={3}>
-            <StatCard
-              title="プロフィール閲覧"
-              value={stats?.profileViews || 0}
-              icon={<PersonIcon />}
-              color="warning.main"
-            />
-          </Grid>
-        </Grid>
+        <Box 
+          sx={{ 
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              sm: 'repeat(2, 1fr)',
+              md: 'repeat(4, 1fr)'
+            },
+            gap: 3,
+            mb: 4
+          }}
+        >
+          <StatCard
+            title="投稿数"
+            value={stats?.totalPosts || 0}
+            icon={<ArticleIcon />}
+            color="primary.main"
+          />
+          <StatCard
+            title="今週の投稿"
+            value={stats?.recentPosts || 0}
+            icon={<TrendingUpIcon />}
+            color="success.main"
+          />
+          <StatCard
+            title="コメント数"
+            value={stats?.totalComments || 0}
+            icon={<ForumIcon />}
+            color="info.main"
+          />
+          <StatCard
+            title="プロフィール閲覧"
+            value={stats?.profileViews || 0}
+            icon={<PersonIcon />}
+            color="warning.main"
+          />
+        </Box>
 
         {/* クイックアクション */}
         <Paper sx={{ p: 3, mb: 4 }}>

@@ -15,7 +15,7 @@ export function generateCSRFToken(): string {
 
 // CSRF トークンの取得または生成
 export async function getOrGenerateCSRFToken(): Promise<string> {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const existingToken = cookieStore.get(CSRF_TOKEN_NAME);
   
   if (existingToken?.value) {
@@ -44,7 +44,7 @@ export async function verifyCSRFToken(req: NextRequest): Promise<boolean> {
     return true;
   }
   
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const cookieToken = cookieStore.get(CSRF_TOKEN_NAME)?.value;
   
   if (!cookieToken) {

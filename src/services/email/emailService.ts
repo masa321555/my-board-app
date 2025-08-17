@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 import fs from 'fs/promises';
 import path from 'path';
 
-interface EmailOptions {
+export interface EmailOptions {
   to: string;
   subject: string;
   template: string;

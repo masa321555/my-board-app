@@ -39,7 +39,7 @@ export const productionHeaders = {
 // CSPの生成
 function generateCSP(): string {
   const isDevelopment = process.env.NODE_ENV === 'development';
-  const directives = {
+  const directives: Record<string, string[]> = {
     'default-src': ["'self'"],
     'script-src': [
       "'self'",

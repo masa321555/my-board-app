@@ -7,7 +7,6 @@ import {
   Box,
   Typography,
   Button,
-  Grid,
   Card,
   CardContent,
   CardActions,
@@ -173,8 +172,19 @@ export default function HomePage() {
           <Typography variant="h5" component="h3" gutterBottom>
             クイックアクセス
           </Typography>
-          <Grid container spacing={2} sx={{ mt: 2 }}>
-            <Grid xs={12} sm={6} md={3}>
+          <Box 
+            sx={{ 
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(4, 1fr)'
+              },
+              gap: 2,
+              mt: 2
+            }}
+          >
+            <Box>
               <Card>
                 <CardContent>
                   <DashboardIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
@@ -194,9 +204,9 @@ export default function HomePage() {
                   </Button>
                 </CardActions>
               </Card>
-            </Grid>
+            </Box>
             
-            <Grid xs={12} sm={6} md={3}>
+            <Box>
               <Card>
                 <CardContent>
                   <PersonIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
@@ -216,9 +226,9 @@ export default function HomePage() {
                   </Button>
                 </CardActions>
               </Card>
-            </Grid>
+            </Box>
             
-            <Grid xs={12} sm={6} md={3}>
+            <Box>
               <Card>
                 <CardContent>
                   <ArticleIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
@@ -238,9 +248,9 @@ export default function HomePage() {
                   </Button>
                 </CardActions>
               </Card>
-            </Grid>
+            </Box>
             
-            <Grid xs={12} sm={6} md={3}>
+            <Box>
               <Card>
                 <CardContent>
                   <CreateIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
@@ -260,8 +270,8 @@ export default function HomePage() {
                   </Button>
                 </CardActions>
               </Card>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </Paper>
       )}
     </Container>

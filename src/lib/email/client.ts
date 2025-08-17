@@ -20,7 +20,7 @@ export function getEmailClient(): Transporter {
         throw new Error('Gmail credentials not configured. Please set GMAIL_USER and GMAIL_APP_PASSWORD environment variables.');
       }
 
-      transporter = nodemailer.createTransporter({
+      transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
           user: gmailUser,
@@ -42,7 +42,7 @@ export function getEmailClient(): Transporter {
         throw new Error('Yahoo credentials not configured. Please set YAHOO_USER and YAHOO_APP_PASSWORD environment variables.');
       }
 
-      transporter = nodemailer.createTransporter({
+      transporter = nodemailer.createTransport({
         service: 'yahoo',
         auth: {
           user: yahooUser,
@@ -69,7 +69,7 @@ export function getEmailClient(): Transporter {
         throw new Error('SMTP credentials not configured. Please set MAIL_HOST, MAIL_USER, and MAIL_PASS environment variables.');
       }
 
-      transporter = nodemailer.createTransporter({
+      transporter = nodemailer.createTransport({
         host: smtpHost,
         port: smtpPort,
         secure: smtpSecure,

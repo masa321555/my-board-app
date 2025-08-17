@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     // パスワードリセットトークンを生成
     const resetToken = TokenUtils.generatePasswordResetToken(
-      user._id.toString(),
+      (user as any)._id.toString(),
       user.email
     );
 

@@ -21,7 +21,6 @@ import {
   DialogContentText,
   LinearProgress,
 } from '@mui/material';
-import Grid from '@mui/material/Grid2';
 import {
   Person as PersonIcon,
   Email as EmailIcon,
@@ -315,9 +314,18 @@ export default function ProfilePage() {
             </Box>
           )}
 
-          <Grid container spacing={4}>
+          <Box 
+            sx={{ 
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                md: '1fr 2fr'
+              },
+              gap: 4
+            }}
+          >
             {/* 左側：アバターとアクション */}
-            <Grid xs={12} md={4}>
+            <Box>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Avatar
                   src={avatarUrl || undefined}
@@ -372,10 +380,10 @@ export default function ProfilePage() {
                   {session?.user?.email}
                 </Typography>
               </Box>
-            </Grid>
+            </Box>
 
             {/* 右側：プロフィール情報 */}
-            <Grid xs={12} md={8}>
+            <Box>
               <Box sx={{ mb: 3 }}>
                 <TextField
                   fullWidth
@@ -481,8 +489,8 @@ export default function ProfilePage() {
                   アカウント削除
                 </Button>
               </Box>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </Paper>
 
         {/* アカウント削除確認ダイアログ */}

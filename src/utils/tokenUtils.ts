@@ -18,7 +18,7 @@ export class TokenUtils {
     
     return jwt.sign(payload, process.env.JWT_SECRET!, {
       expiresIn: '24h'
-    });
+    } as jwt.SignOptions);
   }
   
   // パスワードリセット用トークンの生成
@@ -31,7 +31,7 @@ export class TokenUtils {
     
     return jwt.sign(payload, process.env.JWT_SECRET!, {
       expiresIn: process.env.PASSWORD_RESET_TOKEN_EXPIRES_IN || '1h'
-    });
+    } as jwt.SignOptions);
   }
   
   // トークンの検証
