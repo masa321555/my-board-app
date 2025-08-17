@@ -1,21 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { auth } from '@/auth';
-import dbConnect from '@/lib/db';
+import { authOptions } from '@/src/lib/auth-options';
+import dbConnect from '@/lib/mongodb';
 import Post from '@/models/Post';
 
 export async function GET(request: NextRequest) {
   try {
-    // より安全なセッション取得
-    let session;
-    try {
-      session = await auth();
-    } catch (authError) {
-      console.error('Auth error:', authError);
-      // フォールバック: getServerSessionを使用
-      const { authOptions } = await import('@/lib/auth-options');
-      session = await getServerSession(authOptions);
-    }
+    const session = await getServerSession(authOptions);
     
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -23,54 +14,67 @@ export async function GET(request: NextRequest) {
         { status: 401 }
       );
     }
-
+    
     await dbConnect();
-
+    
     // ユーザーの投稿統計を取得
     const userId = session.user.id;
     
     // 全投稿数
-    const totalPosts = await Post.countDocuments({ author: userId });
+    const totalPosts = await Post.countDocuments({ 
+      author: userId,
+      deleted: { $ne: true }
+    });
     
-    // 今週の投稿数（過去7日間）
+    // 今週の投稿数
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
     const recentPosts = await Post.countDocuments({
       author: userId,
-      createdAt: { $gte: oneWeekAgo }
+      createdAt: { $gte: oneWeekAgo },
+      deleted: { $ne: true }
     });
     
-    // 最近の投稿（最新5件）
-    const posts = await Post.find({ author: userId })
+    // コメント数（仮の値）
+    const totalComments = 0; // コメント機能実装後に更新
+    
+    // プロフィール閲覧数（仮の値）
+    const profileViews = 0; // プロフィール閲覧機能実装後に更新
+    
+    // 最近の投稿を取得
+    const recentPostsList = await Post.find({
+      author: userId,
+      deleted: { $ne: true }
+    })
       .sort({ createdAt: -1 })
       .limit(5)
-      .select('title createdAt');
+      .select('title createdAt views');
     
-    // 投稿データを整形
-    const recentPostsData = posts.map(post => ({
-      id: post._id.toString(),
-      title: post.title,
-      createdAt: post.createdAt.toISOString(),
-      views: 0, // 今はビュー数の実装がないので0
-      comments: 0, // コメント機能が実装されたら更新
-    }));
-
-    // 統計データ
+    // レスポンスデータを整形
     const stats = {
       totalPosts,
       recentPosts,
-      totalComments: 0, // コメント機能が実装されたら更新
-      profileViews: 0, // プロフィールビュー機能が実装されたら更新
+      totalComments,
+      profileViews
     };
-
+    
+    const recentPostsData = recentPostsList.map(post => ({
+      id: post._id.toString(),
+      title: post.title,
+      createdAt: post.createdAt.toISOString(),
+      views: post.views || 0,
+      comments: 0 // コメント機能実装後に更新
+    }));
+    
     return NextResponse.json({
       stats,
-      recentPosts: recentPostsData,
+      recentPosts: recentPostsData
     });
+    
   } catch (error) {
     console.error('Dashboard data fetch error:', error);
     return NextResponse.json(
-      { error: 'データの取得に失敗しました' },
+      { error: 'ダッシュボードデータの取得に失敗しました' },
       { status: 500 }
     );
   }

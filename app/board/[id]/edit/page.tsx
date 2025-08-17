@@ -212,13 +212,15 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-          <Alert 
-            severity="error" 
-            sx={{ mb: 2, display: error ? 'flex' : 'none' }} 
-            key={`error-${dynamicKey}`}
-          >
-            {error}
-          </Alert>
+          {error && (
+            <Alert 
+              severity="error" 
+              sx={{ mb: 2 }} 
+              key={`error-${dynamicKey}`}
+            >
+              {error}
+            </Alert>
+          )}
 
           <TextField
             fullWidth

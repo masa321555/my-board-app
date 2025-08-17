@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 厳格モード
-  reactStrictMode: true,
+  // 厳格モード - React 19のremoveChildエラー回避のため無効化
+  reactStrictMode: false,
   
   
   // 画像最適化
@@ -50,13 +50,7 @@ const nextConfig = {
   
   // リダイレクト設定
   async redirects() {
-    return [
-      {
-        source: '/dashboard',
-        destination: '/board',
-        permanent: true,
-      },
-    ];
+    return [];
   },
   
   // Webpack設定
@@ -80,12 +74,12 @@ const nextConfig = {
   
   // TypeScriptの設定
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   
   // ESLintの設定
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
 };
 

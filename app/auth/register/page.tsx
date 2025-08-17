@@ -12,13 +12,13 @@ import {
   TextField,
   Button,
   Typography,
-  Alert,
   Paper,
   CircularProgress,
   InputAdornment,
   IconButton,
   LinearProgress,
 } from '@mui/material';
+import SafeAlert from '@/components/SafeAlert';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -39,7 +39,7 @@ function RegisterContent() {
     isStrong: false,
   });
   
-  const mountedRef = useRef(false);
+  const mountedRef = useRef(true);
   const isSubmittingRef = useRef(false);
   const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -273,19 +273,23 @@ function RegisterContent() {
           </Typography>
           
           <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3 }}>
-            <Alert 
+            <SafeAlert 
+              open={!!serverError}
               severity="error" 
-              sx={{ mb: 2, display: serverError ? 'flex' : 'none' }}
+              sx={{ mb: 2 }}
+              onClose={() => setServerError('')}
             >
               {serverError}
-            </Alert>
+            </SafeAlert>
             
-            <Alert 
+            <SafeAlert 
+              open={!!successMessage}
               severity="success" 
-              sx={{ mb: 2, display: successMessage ? 'flex' : 'none' }}
+              sx={{ mb: 2 }}
+              onClose={() => setSuccessMessage('')}
             >
               {successMessage}
-            </Alert>
+            </SafeAlert>
             
             <TextField
               margin="normal"

@@ -8,12 +8,12 @@ import {
   TextField,
   Button,
   Typography,
-  Alert,
   Paper,
   CircularProgress,
   InputAdornment,
   IconButton,
 } from '@mui/material';
+import SafeAlert from '@/components/SafeAlert';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 function ResetPasswordForm() {
@@ -99,17 +99,23 @@ function ResetPasswordForm() {
           </Typography>
           
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            {error && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {error}
-              </Alert>
-            )}
+            <SafeAlert 
+              open={!!error}
+              severity="error" 
+              sx={{ mb: 2 }}
+              onClose={() => setError('')}
+            >
+              {error}
+            </SafeAlert>
             
-            {success && (
-              <Alert severity="success" sx={{ mb: 2 }}>
-                {success}
-              </Alert>
-            )}
+            <SafeAlert 
+              open={!!success}
+              severity="success" 
+              sx={{ mb: 2 }}
+              onClose={() => setSuccess('')}
+            >
+              {success}
+            </SafeAlert>
             
             <TextField
               margin="normal"

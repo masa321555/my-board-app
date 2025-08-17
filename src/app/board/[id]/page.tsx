@@ -10,13 +10,13 @@ import {
   Typography,
   Button,
   CircularProgress,
-  Alert,
   Divider,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
 } from '@mui/material';
+import StableAlert from '@/components/StableAlert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -104,9 +104,14 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
   if (error && !post) {
     return (
       <Container maxWidth="md" sx={{ py: 4 }}>
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
+        <StableAlert 
+              open={!!error}
+              severity="error" 
+              sx={{ mb: 2 }}
+              onClose={() => setError('')}
+            >
+              {error}
+            </StableAlert>
         <Button
           startIcon={<ArrowBackIcon />}
           onClick={() => router.push('/board')}

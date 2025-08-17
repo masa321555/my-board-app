@@ -10,7 +10,6 @@ import {
   Typography,
   Button,
   CircularProgress,
-  Alert,
   Pagination,
   Card,
   CardContent,
@@ -29,6 +28,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
+import StableAlert from '@/components/StableAlert';
 
 interface Post {
   _id: string;
@@ -72,6 +72,8 @@ export default function BoardPage() {
   const mountedRef = useRef(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const currentPageRef = useRef(1);
+  const currentLimitRef = useRef(10);
   // 動的キー生成（より安定したキー）- Hooksの順序を保つためここに配置
   const dynamicKey = useRef(Date.now()).current;
 
@@ -82,7 +84,11 @@ export default function BoardPage() {
       mountedRef.current = false;
       // クリーンアップ: リクエストをキャンセル
       if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
+        try {
+          abortControllerRef.current.abort();
+        } catch (error) {
+          // AbortErrorは無視
+        }
       }
       // クリーンアップ: タイムアウトをクリア
       if (refreshTimeoutRef.current) {
@@ -109,16 +115,15 @@ export default function BoardPage() {
   useEffect(() => {
     const pageParam = searchParams.get('page');
     const page = pageParam ? parseInt(pageParam, 10) : 1;
-    if (page !== pagination.page) {
-      safeSetState(() => {
-        setPagination(prev => ({ ...prev, page }));
-      });
-    }
-  }, [searchParams, pagination.page, safeSetState]);
+    currentPageRef.current = page;
+    safeSetState(() => {
+      setPagination(prev => ({ ...prev, page }));
+    });
+  }, [searchParams, safeSetState]);
 
-  // 投稿取得関数をメモ化
-  const fetchPosts = useCallback(async (forceRefresh = false) => {
-    if (!mountedRef.current || (isRefreshing && !forceRefresh)) return;
+  // 投稿取得関数（メモ化しない）
+  const fetchPosts = async (forceRefresh = false) => {
+    if (!mountedRef.current) return;
     
     // 前のリクエストをキャンセル
     if (abortControllerRef.current) {
@@ -138,7 +143,7 @@ export default function BoardPage() {
 
     try {
       const response = await fetch(
-        `/api/posts?page=${pagination.page}&limit=${pagination.limit}`,
+        `/api/posts?page=${currentPageRef.current}&limit=${currentLimitRef.current}`,
         { signal: abortControllerRef.current.signal }
       );
       
@@ -151,31 +156,35 @@ export default function BoardPage() {
         setPosts(data.posts);
         setPagination(data.pagination);
       });
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        // リクエストがキャンセルされた場合は何もしない
+    } catch (error: any) {
+      // AbortErrorの場合は無視
+      if (error?.name === 'AbortError' || error?.code === 'ABORT_ERR') {
         console.log('投稿取得リクエストがキャンセルされました');
         return;
       }
-      safeSetState(() => {
-        setError(error instanceof Error ? error.message : 'エラーが発生しました');
-      });
+      // その他のエラーの場合のみ表示
+      if (mountedRef.current) {
+        safeSetState(() => {
+          setError(error instanceof Error ? error.message : 'エラーが発生しました');
+        });
+      }
     } finally {
       safeSetState(() => {
         setLoading(false);
         setIsRefreshing(false);
       });
     }
-  }, [isRefreshing, pagination.page, pagination.limit, safeSetState]);
+  };
 
   // 認証済みの場合に投稿を取得
   useEffect(() => {
-    if (status === 'authenticated') {
+    if (status === 'authenticated' && currentPageRef.current > 0) {
       fetchPosts();
     }
-  }, [status, fetchPosts]);
+  }, [status, pagination.page]); // ページ変更時にも再取得
 
   const handlePageChange = useCallback((event: React.ChangeEvent<unknown>, value: number) => {
+    currentPageRef.current = value;
     safeSetState(() => {
       setPagination(prev => ({ ...prev, page: value }));
     });
@@ -265,13 +274,13 @@ export default function BoardPage() {
         setIsDeleting(false);
       });
     }
-  }, [postToDelete, isDeleting, fetchPosts, safeSetState]);
+  }, [postToDelete, isDeleting, safeSetState]);
 
   const handleRefresh = useCallback(() => {
     if (mountedRef.current && !loading) {
       fetchPosts(true);
     }
-  }, [loading, fetchPosts]);
+  }, [loading]);
 
   const handleNewPostClick = useCallback(() => {
     if (mountedRef.current && !isNavigating) {
@@ -368,13 +377,13 @@ export default function BoardPage() {
         </Box>
       </Box>
 
-      <Alert 
-        severity="error" 
-        sx={{ mb: 2, display: error ? 'flex' : 'none' }} 
-        key={`error-${dynamicKey}`}
+      <StableAlert
+        open={!!error}
+        severity="error"
+        onClose={() => setError('')}
       >
         {error}
-      </Alert>
+      </StableAlert>
 
       {posts.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: 'center' }}>
@@ -464,13 +473,13 @@ export default function BoardPage() {
           <Typography>
             この操作は取り消すことができません。本当に削除してもよろしいですか？
           </Typography>
-          <Alert 
-            severity="error" 
-            sx={{ mt: 2, display: error ? 'flex' : 'none' }} 
-            key={`dialog-error-${dynamicKey}`}
+          <StableAlert
+            open={!!error}
+            severity="error"
+            onClose={() => setError('')}
           >
             {error}
-          </Alert>
+          </StableAlert>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteCancel} disabled={isDeleting}>

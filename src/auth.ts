@@ -83,9 +83,9 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // ログイン後に掲示板にリダイレクト
+      // ログイン後にダッシュボードにリダイレクト
       if (url.startsWith('/auth/signin') || url.startsWith('/auth/verify-email')) {
-        return `${baseUrl}/board`;
+        return `${baseUrl}/dashboard`;
       }
       return url;
     },

@@ -10,7 +10,6 @@ import {
   Typography,
   Button,
   CircularProgress,
-  Alert,
   Pagination,
   Card,
   CardContent,
@@ -23,6 +22,7 @@ import {
   TextField,
   Fab,
 } from '@mui/material';
+import SafeAlert from '@/components/SafeAlert';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -146,11 +146,14 @@ export default function BoardPage() {
         </Button>
       </Box>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
+      <SafeAlert 
+        open={!!error} 
+        severity="error" 
+        sx={{ mb: 2 }}
+        onClose={() => setError('')}
+      >
+        {error}
+      </SafeAlert>
 
       {posts.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: 'center' }}>

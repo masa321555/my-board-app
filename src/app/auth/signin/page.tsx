@@ -10,13 +10,13 @@ import {
   TextField,
   Button,
   Typography,
-  Alert,
   Paper,
   CircularProgress,
   InputAdornment,
   IconButton,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import StableAlert from '@/components/StableAlert';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -41,8 +41,10 @@ export default function SignInPage() {
       if (result?.error) {
         setError('メールアドレスまたはパスワードが正しくありません');
       } else {
-        router.push('/board');
-        router.refresh();
+        // リダイレクト前に少し待機
+        setTimeout(() => {
+          router.push('/board');
+        }, 100);
       }
     } catch (error) {
       setError('ログインに失敗しました');
@@ -67,11 +69,14 @@ export default function SignInPage() {
           </Typography>
           
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            {error && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {error}
-              </Alert>
-            )}
+            <StableAlert 
+              open={!!error}
+              severity="error" 
+              sx={{ mb: 2 }}
+              onClose={() => setError('')}
+            >
+              {error}
+            </StableAlert>
             
             <TextField
               margin="normal"

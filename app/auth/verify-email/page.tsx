@@ -10,8 +10,8 @@ import {
   Typography,
   Button,
   CircularProgress,
-  Alert,
 } from '@mui/material';
+import SafeAlert from '@/components/SafeAlert';
 import { CheckCircle, Email } from '@mui/icons-material';
 
 export default function VerifyEmailPage() {
@@ -107,17 +107,23 @@ export default function VerifyEmailPage() {
             メール内のリンクをクリックして、アカウントの確認を完了してください。
           </Typography>
 
-          {verificationStatus === 'success' && (
-            <Alert severity="success" sx={{ mb: 3 }}>
-              確認メールを再送信しました。メールボックスをご確認ください。
-            </Alert>
-          )}
+          <SafeAlert 
+            open={verificationStatus === 'success'}
+            severity="success" 
+            sx={{ mb: 3 }}
+            onClose={() => setVerificationStatus('pending')}
+          >
+            確認メールを再送信しました。メールボックスをご確認ください。
+          </SafeAlert>
 
-          {verificationStatus === 'error' && (
-            <Alert severity="error" sx={{ mb: 3 }}>
-              メールの送信に失敗しました。しばらく時間をおいてから再度お試しください。
-            </Alert>
-          )}
+          <SafeAlert 
+            open={verificationStatus === 'error'}
+            severity="error" 
+            sx={{ mb: 3 }}
+            onClose={() => setVerificationStatus('pending')}
+          >
+            メールの送信に失敗しました。しばらく時間をおいてから再度お試しください。
+          </SafeAlert>
 
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Button
@@ -144,7 +150,11 @@ export default function VerifyEmailPage() {
 
           {/* 開発環境でのメッセージ */}
           {process.env.NODE_ENV === 'development' && (
-            <Alert severity="info" sx={{ mt: 3 }}>
+            <SafeAlert 
+              open={true}
+              severity="info" 
+              sx={{ mt: 3 }}
+            >
               開発環境では、メール確認は自動的にスキップされます。
               <Button 
                 size="small" 
@@ -153,7 +163,7 @@ export default function VerifyEmailPage() {
               >
                 掲示板へ進む
               </Button>
-            </Alert>
+            </SafeAlert>
           )}
         </Paper>
       </Box>

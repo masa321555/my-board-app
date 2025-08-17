@@ -10,9 +10,9 @@ import {
   Typography,
   TextField,
   Button,
-  Alert,
   CircularProgress,
 } from '@mui/material';
+import SafeAlert from '@/components/SafeAlert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 interface Post {
@@ -114,9 +114,14 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
   if (error && !title) {
     return (
       <Container maxWidth="md" sx={{ py: 4 }}>
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <SafeAlert 
+          open={!!error} 
+          severity="error" 
+          sx={{ mb: 2 }}
+          onClose={() => setError('')}
+        >
           {error}
-        </Alert>
+        </SafeAlert>
         <Button
           startIcon={<ArrowBackIcon />}
           onClick={() => router.push('/board')}
@@ -143,11 +148,14 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
+          <SafeAlert 
+            open={!!error} 
+            severity="error" 
+            sx={{ mb: 2 }}
+            onClose={() => setError('')}
+          >
+            {error}
+          </SafeAlert>
 
           <TextField
             fullWidth

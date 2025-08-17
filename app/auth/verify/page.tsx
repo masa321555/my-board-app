@@ -7,12 +7,12 @@ import {
   Container,
   Box,
   Typography,
-  Alert,
   Paper,
   CircularProgress,
   Button,
   Fade,
 } from '@mui/material';
+import SafeAlert from '@/components/SafeAlert';
 import {
   CheckCircle as CheckCircleIcon,
   Error as ErrorIcon,
@@ -151,9 +151,14 @@ function VerifyContent() {
                 </>
               ) : (
                 <>
-                  <Alert severity={getAlertSeverity()} sx={{ mb: 3, textAlign: 'left' }}>
+                  <SafeAlert 
+                    open={!!message}
+                    severity={getAlertSeverity()} 
+                    sx={{ mb: 3, textAlign: 'left' }}
+                    onClose={() => setMessage('')}
+                  >
                     {message}
-                  </Alert>
+                  </SafeAlert>
 
                   {userInfo && userInfo.name && (
                     <Typography variant="body1" sx={{ mb: 3 }}>
@@ -217,11 +222,15 @@ function VerifyContent() {
 
         {/* 開発環境向けの情報 */}
         {process.env.NODE_ENV === 'development' && status !== 'loading' && (
-          <Alert severity="info" sx={{ mt: 3, width: '100%' }}>
+          <SafeAlert 
+            open={true}
+            severity="info" 
+            sx={{ mt: 3, width: '100%' }}
+          >
             <Typography variant="caption">
               開発環境：トークン = {token ? `${token.substring(0, 20)}...` : 'なし'}
             </Typography>
-          </Alert>
+          </SafeAlert>
         )}
       </Box>
     </Container>

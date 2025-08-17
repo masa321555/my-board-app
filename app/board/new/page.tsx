@@ -10,10 +10,10 @@ import {
   Typography,
   TextField,
   Button,
-  Alert,
   CircularProgress,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import StableAlert from '@/components/StableAlert';
 
 export default function NewPostPage() {
   const router = useRouter();
@@ -22,7 +22,6 @@ export default function NewPostPage() {
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isNavigating, setIsNavigating] = useState(false);
   const mountedRef = useRef(false);
   // 動的キー生成（より安定したキー）- Hooksの順序を保つためここに配置
   const dynamicKey = useRef(Date.now()).current;
@@ -45,14 +44,14 @@ export default function NewPostPage() {
   // 認証状態の確認
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/auth/signin');
+      window.location.href = '/auth/signin';
     }
-  }, [status, router]);
+  }, [status]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!mountedRef.current || isLoading || isNavigating) return;
+    if (!mountedRef.current || isLoading) return;
     
     safeSetState(() => {
       setError('');
@@ -77,69 +76,45 @@ export default function NewPostPage() {
         throw new Error(data.error || '投稿の作成に失敗しました');
       }
 
-      safeSetState(() => {
-        setIsNavigating(true);
-      });
-
-      // より長い遅延を入れてからリダイレクト
+      // 投稿成功時は直接window.location.hrefを使用
       setTimeout(() => {
-        if (mountedRef.current) {
-          try {
-            router.push('/board');
-          } catch (navError) {
-            console.error('Navigation error:', navError);
-            // フォールバック: 手動でページをリロード
-            window.location.href = '/board';
-          }
-        }
-      }, 2000);
+        window.location.href = '/board';
+      }, 500);
     } catch (error) {
       safeSetState(() => {
         setError(error instanceof Error ? error.message : 'エラーが発生しました');
         setIsLoading(false);
       });
     }
-  }, [isLoading, isNavigating, title, content, safeSetState, router]);
+  }, [isLoading, title, content, safeSetState, router]);
 
   const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (mountedRef.current && !isLoading && !isNavigating) {
+    if (mountedRef.current && !isLoading) {
       safeSetState(() => {
         setTitle(e.target.value);
       });
     }
-  }, [isLoading, isNavigating, safeSetState]);
+  }, [isLoading, safeSetState]);
 
   const handleContentChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (mountedRef.current && !isLoading && !isNavigating) {
+    if (mountedRef.current && !isLoading) {
       safeSetState(() => {
         setContent(e.target.value);
       });
     }
-  }, [isLoading, isNavigating, safeSetState]);
+  }, [isLoading, safeSetState]);
 
   const handleBackClick = useCallback(() => {
-    if (mountedRef.current && !isLoading && !isNavigating) {
-      try {
-        router.push('/board');
-      } catch (navError) {
-        console.error('Navigation error:', navError);
-        // フォールバック: 手動でページをリロード
-        window.location.href = '/board';
-      }
+    if (!isLoading) {
+      window.location.href = '/board';
     }
-  }, [isLoading, isNavigating, router]);
+  }, [isLoading]);
 
   const handleCancelClick = useCallback(() => {
-    if (mountedRef.current && !isLoading && !isNavigating) {
-      try {
-        router.push('/board');
-      } catch (navError) {
-        console.error('Navigation error:', navError);
-        // フォールバック: 手動でページをリロード
-        window.location.href = '/board';
-      }
+    if (!isLoading) {
+      window.location.href = '/board';
     }
-  }, [isLoading, isNavigating, router]);
+  }, [isLoading]);
 
   // マウント前はローディング表示
   if (status === 'loading') {
@@ -161,7 +136,7 @@ export default function NewPostPage() {
         startIcon={<ArrowBackIcon />}
         onClick={handleBackClick}
         sx={{ mb: 2 }}
-        disabled={isLoading || isNavigating}
+        disabled={isLoading}
       >
         掲示板に戻る
       </Button>
@@ -172,21 +147,22 @@ export default function NewPostPage() {
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-          <Alert 
-            severity="error" 
-            sx={{ mb: 2, display: error ? 'flex' : 'none' }} 
-            key={`error-${dynamicKey}`}
+          <StableAlert
+            open={!!error}
+            severity="error"
+            onClose={() => setError('')}
           >
             {error}
-          </Alert>
+          </StableAlert>
 
           <TextField
             fullWidth
             label="タイトル"
+            name="title"
             value={title}
             onChange={handleTitleChange}
             required
-            disabled={isLoading || isNavigating}
+            disabled={isLoading}
             sx={{ mb: 3 }}
             inputProps={{ maxLength: 100 }}
             helperText={`${title.length}/100文字`}
@@ -196,10 +172,11 @@ export default function NewPostPage() {
           <TextField
             fullWidth
             label="本文"
+            name="content"
             value={content}
             onChange={handleContentChange}
             required
-            disabled={isLoading || isNavigating}
+            disabled={isLoading}
             multiline
             rows={10}
             sx={{ mb: 3 }}
@@ -212,7 +189,7 @@ export default function NewPostPage() {
             <Button
               type="submit"
               variant="contained"
-              disabled={isLoading || isNavigating || !title.trim() || !content.trim()}
+              disabled={isLoading || !title.trim() || !content.trim()}
               sx={{ minWidth: 120 }}
             >
               {isLoading ? <CircularProgress size={24} /> : '投稿する'}
@@ -220,7 +197,7 @@ export default function NewPostPage() {
             <Button
               variant="outlined"
               onClick={handleCancelClick}
-              disabled={isLoading || isNavigating}
+              disabled={isLoading}
             >
               キャンセル
             </Button>

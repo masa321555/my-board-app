@@ -8,8 +8,8 @@ import {
   Paper,
   Typography,
   Button,
-  Alert,
 } from '@mui/material';
+import SafeAlert from '@/components/SafeAlert';
 import { CheckCircle, Error, Warning } from '@mui/icons-material';
 
 export default function EmailConfirmedPage() {
@@ -73,9 +73,13 @@ export default function EmailConfirmedPage() {
             {config.title}
           </Typography>
           
-          <Alert severity={config.alertType} sx={{ mt: 3, mb: 3 }}>
+          <SafeAlert 
+            open={true}
+            severity={config.alertType} 
+            sx={{ mt: 3, mb: 3 }}
+          >
             {config.message}
-          </Alert>
+          </SafeAlert>
 
           <Button
             variant="contained"

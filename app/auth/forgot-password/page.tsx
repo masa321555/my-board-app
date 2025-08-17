@@ -8,10 +8,10 @@ import {
   TextField,
   Button,
   Typography,
-  Alert,
   Paper,
   CircularProgress,
 } from '@mui/material';
+import SafeAlert from '@/components/SafeAlert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 export default function ForgotPasswordPage() {
@@ -23,7 +23,7 @@ export default function ForgotPasswordPage() {
   const [isNavigating, setIsNavigating] = useState(false);
   const isSubmitting = useRef(false);
   const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const mountedRef = useRef(false);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -161,21 +161,25 @@ export default function ForgotPasswordPage() {
           </Typography>
           
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            <Alert 
+            <SafeAlert 
+              open={!!error}
               severity="error" 
-              sx={{ mb: 2, display: error ? 'flex' : 'none' }} 
+              sx={{ mb: 2 }}
+              onClose={() => setError('')}
               key={`error-${dynamicKey}`}
             >
               {error}
-            </Alert>
+            </SafeAlert>
             
-            <Alert 
+            <SafeAlert 
+              open={!!success}
               severity="success" 
-              sx={{ mb: 2, display: success ? 'flex' : 'none' }} 
+              sx={{ mb: 2 }}
+              onClose={() => setSuccess('')}
               key={`success-${dynamicKey}`}
             >
               {success}
-            </Alert>
+            </SafeAlert>
             
             <TextField
               margin="normal"

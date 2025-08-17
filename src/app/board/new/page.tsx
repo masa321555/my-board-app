@@ -10,9 +10,9 @@ import {
   Typography,
   TextField,
   Button,
-  Alert,
   CircularProgress,
 } from '@mui/material';
+import SafeAlert from '@/components/SafeAlert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 export default function NewPostPage() {
@@ -83,11 +83,14 @@ export default function NewPostPage() {
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
+          <SafeAlert 
+            open={!!error} 
+            severity="error" 
+            sx={{ mb: 2 }}
+            onClose={() => setError('')}
+          >
+            {error}
+          </SafeAlert>
 
           <TextField
             fullWidth

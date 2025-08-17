@@ -9,13 +9,13 @@ import {
   TextField,
   Button,
   Typography,
-  Alert,
   Paper,
   CircularProgress,
   InputAdornment,
   IconButton,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import StableAlert from '@/components/StableAlert';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -104,17 +104,23 @@ export default function RegisterPage() {
           </Typography>
           
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            {error && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {error}
-              </Alert>
-            )}
+            <StableAlert 
+              open={!!error}
+              severity="error" 
+              sx={{ mb: 2 }}
+              onClose={() => setError('')}
+            >
+              {error}
+            </StableAlert>
             
-            {success && (
-              <Alert severity="success" sx={{ mb: 2 }}>
-                {success}
-              </Alert>
-            )}
+            <StableAlert 
+              open={!!success}
+              severity="success" 
+              sx={{ mb: 2 }}
+              onClose={() => setSuccess('')}
+            >
+              {success}
+            </StableAlert>
             
             <TextField
               margin="normal"

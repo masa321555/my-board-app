@@ -9,12 +9,12 @@ import {
   TextField,
   Button,
   Typography,
-  Alert,
   Paper,
   CircularProgress,
   InputAdornment,
   IconButton,
 } from '@mui/material';
+import SafeAlert from '@/components/SafeAlert';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -33,14 +33,13 @@ function SignInContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
   
-  const mountedRef = useRef(false);
+  const [mounted, setMounted] = useState(false);
   const isSubmittingRef = useRef(false);
   const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    mountedRef.current = true;
+    setMounted(true);
     return () => {
-      mountedRef.current = false;
       if (navigationTimeoutRef.current) {
         clearTimeout(navigationTimeoutRef.current);
       }
@@ -48,13 +47,13 @@ function SignInContent() {
   }, []);
 
   const safeSetState = useCallback((updater: () => void) => {
-    if (mountedRef.current) {
+    if (mounted) {
       updater();
     }
-  }, []);
+  }, [mounted]);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!mountedRef.current || isLoading || isNavigating) return;
+    if (!mounted || isLoading || isNavigating) return;
     
     const { name, value } = e.target;
     safeSetState(() => {
@@ -72,7 +71,7 @@ function SignInContent() {
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!mountedRef.current || isSubmittingRef.current || isLoading || isNavigating) return;
+    if (!mounted || isSubmittingRef.current || isLoading || isNavigating) return;
     
     safeSetState(() => {
       setError('');
@@ -87,7 +86,7 @@ function SignInContent() {
         redirect: false,
       });
 
-      if (!mountedRef.current) return;
+      if (!mounted) return;
 
       if (result?.error) {
         safeSetState(() => {
@@ -102,7 +101,7 @@ function SignInContent() {
         
         // ナビゲーション処理
         navigationTimeoutRef.current = setTimeout(() => {
-          if (mountedRef.current && !isNavigating) {
+          if (mounted && !isNavigating) {
             try {
               const url = decodeURIComponent(callbackUrl);
               if (url.startsWith('/') || url.startsWith(window.location.origin)) {
@@ -116,7 +115,7 @@ function SignInContent() {
                 router.push(decodeURIComponent(callbackUrl));
               } catch (fallbackError) {
                 console.error('Fallback navigation error:', fallbackError);
-                if (mountedRef.current && !isNavigating) {
+                if (mounted && !isNavigating) {
                   window.location.href = decodeURIComponent(callbackUrl);
                 }
               }
@@ -127,7 +126,7 @@ function SignInContent() {
       }
     } catch (error) {
       console.error('Sign in error:', error);
-      if (mountedRef.current) {
+      if (mounted) {
         safeSetState(() => {
           setError('ログインに失敗しました');
           setIsLoading(false);
@@ -136,7 +135,7 @@ function SignInContent() {
       }
     }
     
-    if (mountedRef.current) {
+    if (mounted) {
       safeSetState(() => {
         setIsLoading(false);
       });
@@ -145,15 +144,15 @@ function SignInContent() {
   }, [formData, callbackUrl, isLoading, isNavigating, safeSetState, router]);
 
   const handlePasswordToggle = useCallback(() => {
-    if (mountedRef.current && !isLoading && !isNavigating) {
+    if (mounted && !isLoading && !isNavigating) {
       safeSetState(() => {
         setShowPassword(prev => !prev);
       });
     }
   }, [isLoading, isNavigating, safeSetState]);
 
-  // マウント前またはナビゲーション中はローディング表示
-  if (!mountedRef.current || isNavigating) {
+  // ナビゲーション中はローディング表示
+  if (isNavigating) {
     return (
       <Container component="main" maxWidth="xs">
         <Box
@@ -190,12 +189,14 @@ function SignInContent() {
           </Typography>
           
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            <Alert 
+            <SafeAlert 
+              open={!!error}
               severity="error" 
-              sx={{ mb: 2, display: error ? 'flex' : 'none' }}
+              sx={{ mb: 2 }}
+              onClose={() => setError('')}
             >
               {error}
-            </Alert>
+            </SafeAlert>
             
             <TextField
               margin="normal"
