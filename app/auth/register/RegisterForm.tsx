@@ -144,6 +144,10 @@ export default function RegisterForm() {
               setServerError(result.error || '登録に失敗しました');
             });
           }
+          // エラー時はisSubmittingをfalseに設定
+          safeSetState(() => {
+            setIsSubmitting(false);
+          });
         }
         return;
       }
@@ -158,11 +162,18 @@ export default function RegisterForm() {
         navigationTimeoutRef.current = setTimeout(() => {
           if (mountedRef.current) {
             try {
+              // より安全なリダイレクト方法
               router.push('/auth/signin');
             } catch (navError) {
               console.error('Navigation error:', navError);
-              // フォールバック: 手動でページをリロード
-              window.location.href = '/auth/signin';
+              // フォールバック: 再度router.pushを試行
+              try {
+                router.push('/auth/signin');
+              } catch (fallbackError) {
+                console.error('Fallback navigation error:', fallbackError);
+                // 最後の手段としてwindow.locationを使用
+                window.location.href = '/auth/signin';
+              }
             }
           }
         }, 3000);
