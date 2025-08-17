@@ -190,11 +190,12 @@ function SignInContent() {
           </Typography>
           
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            {error && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {error}
-              </Alert>
-            )}
+            <Alert 
+              severity="error" 
+              sx={{ mb: 2, display: error ? 'flex' : 'none' }}
+            >
+              {error}
+            </Alert>
             
             <TextField
               margin="normal"
