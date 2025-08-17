@@ -58,8 +58,6 @@ export async function GET(request: NextRequest) {
 
     // メールアドレスを確認済みに更新
     user.emailVerified = true;
-    user.emailVerificationToken = undefined;
-    user.emailVerificationExpires = undefined;
     await user.save();
 
     // ウェルカムメールを送信（本番環境のみ）

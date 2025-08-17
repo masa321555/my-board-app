@@ -53,8 +53,6 @@ export async function POST(request: NextRequest) {
 
     // メールアドレスを確認済みに更新
     user.emailVerified = true;
-    user.emailVerificationToken = undefined;
-    user.emailVerificationExpires = undefined;
     await user.save();
 
     return NextResponse.json(

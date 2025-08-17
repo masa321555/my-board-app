@@ -49,10 +49,7 @@ export async function POST(request: NextRequest) {
       user.email
     );
 
-    // トークンを保存
-    user.emailVerificationToken = confirmationToken;
-    user.emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24時間後
-    await user.save();
+    // JWTトークンに有効期限があるため、データベースへの保存は不要
 
     // 確認メールを送信
     try {
