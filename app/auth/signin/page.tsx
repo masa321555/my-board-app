@@ -95,6 +95,7 @@ function SignInContent() {
           setError('メールアドレスまたはパスワードが正しくありません');
           setIsLoading(false);
         });
+        isSubmitting.current = false;
       } else if (result?.ok) {
         safeSetState(() => {
           setIsNavigating(true);
@@ -199,13 +200,15 @@ function SignInContent() {
           </Typography>
           
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            <Alert 
-              severity="error" 
-              sx={{ mb: 2, display: error ? 'flex' : 'none' }} 
-              key={`error-${dynamicKey}`}
-            >
-              {error}
-            </Alert>
+            {error && (
+              <Alert 
+                severity="error" 
+                sx={{ mb: 2 }} 
+                key={`error-${dynamicKey}`}
+              >
+                {error}
+              </Alert>
+            )}
             
             <TextField
               margin="normal"
