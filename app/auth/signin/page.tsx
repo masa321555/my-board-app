@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, Suspense, useEffect, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import {
@@ -20,6 +20,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 function SignInContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
   
   const [formData, setFormData] = useState({
@@ -103,12 +104,25 @@ function SignInContent() {
         navigationTimeoutRef.current = setTimeout(() => {
           if (mountedRef.current) {
             try {
-              // 成功時は直接window.locationでリダイレクト（DOM操作を避ける）
-              window.location.href = decodeURIComponent(callbackUrl);
+              // より安全なリダイレクト方法
+              const url = decodeURIComponent(callbackUrl);
+              // 現在のドメインと同じ場合はrouter.pushを使用
+              if (url.startsWith('/') || url.startsWith(window.location.origin)) {
+                router.push(url);
+              } else {
+                // 外部URLの場合はwindow.locationを使用
+                window.location.href = url;
+              }
             } catch (navError) {
               console.error('Navigation error:', navError);
-              // フォールバック: 手動でページをリロード
-              window.location.href = decodeURIComponent(callbackUrl);
+              // フォールバック: router.pushを使用
+              try {
+                router.push(decodeURIComponent(callbackUrl));
+              } catch (fallbackError) {
+                console.error('Fallback navigation error:', fallbackError);
+                // 最後の手段としてwindow.locationを使用
+                window.location.href = decodeURIComponent(callbackUrl);
+              }
             }
           }
         }, 2000); // 遅延を2秒に延長
