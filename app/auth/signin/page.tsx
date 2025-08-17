@@ -102,7 +102,7 @@ function SignInContent() {
         
         // より長い遅延を入れてからリダイレクト
         navigationTimeoutRef.current = setTimeout(() => {
-          if (mountedRef.current) {
+          if (mountedRef.current && !isNavigating) {
             try {
               // より安全なリダイレクト方法
               const url = decodeURIComponent(callbackUrl);
@@ -121,7 +121,9 @@ function SignInContent() {
               } catch (fallbackError) {
                 console.error('Fallback navigation error:', fallbackError);
                 // 最後の手段としてwindow.locationを使用
-                window.location.href = decodeURIComponent(callbackUrl);
+                if (mountedRef.current && !isNavigating) {
+                  window.location.href = decodeURIComponent(callbackUrl);
+                }
               }
             }
           }
@@ -135,6 +137,7 @@ function SignInContent() {
           setError('ログインに失敗しました');
           setIsLoading(false);
         });
+        isSubmitting.current = false;
       }
     }
     
@@ -143,8 +146,8 @@ function SignInContent() {
       safeSetState(() => {
         setIsLoading(false);
       });
+      isSubmitting.current = false;
     }
-    isSubmitting.current = false;
   }, [formData, callbackUrl, isLoading, isNavigating, safeSetState]);
 
   const handlePasswordToggle = useCallback(() => {
