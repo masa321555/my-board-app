@@ -134,25 +134,38 @@ export default function HomePage() {
         主な機能
       </Typography>
       
-      <Grid container spacing={4} sx={{ mb: 6 }}>
+      <Box sx={{ 
+        display: 'flex', 
+        gap: 3, 
+        mb: 6, 
+        flexWrap: { xs: 'wrap', md: 'nowrap' },
+        justifyContent: 'center'
+      }}>
         {features.map((feature, index) => (
-          <Grid item xs={12} md={4} key={index}>
-            <Card sx={{ height: '100%', textAlign: 'center' }}>
-              <CardContent>
-                <Box sx={{ color: 'primary.main', mb: 2 }}>
-                  {feature.icon}
-                </Box>
-                <Typography variant="h5" component="h3" gutterBottom>
-                  {feature.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {feature.description}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+          <Card 
+            key={index} 
+            sx={{ 
+              flex: { xs: '1 1 100%', md: '1 1 0' },
+              minWidth: { xs: '100%', md: '300px' },
+              maxWidth: { xs: '100%', md: '400px' },
+              textAlign: 'center',
+              height: 'fit-content'
+            }}
+          >
+            <CardContent>
+              <Box sx={{ color: 'primary.main', mb: 2 }}>
+                {feature.icon}
+              </Box>
+              <Typography variant="h5" component="h3" gutterBottom>
+                {feature.title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {feature.description}
+              </Typography>
+            </CardContent>
+          </Card>
         ))}
-      </Grid>
+      </Box>
 
       {/* 会員向けクイックリンク */}
       {status === 'authenticated' && (
