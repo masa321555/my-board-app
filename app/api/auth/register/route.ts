@@ -77,6 +77,10 @@ export async function POST(request: NextRequest) {
     console.log('受信したボディのキー:', Object.keys(body));
     console.log('受信した完全なボディ:', JSON.stringify(body, null, 2));
     
+    // passwordLengthフィールドの存在を最初にチェック
+    const hasPasswordLength = 'passwordLength' in body;
+    const hasConfirmPasswordLength = 'confirmPasswordLength' in body;
+    
     console.log('登録リクエスト受信:', { 
       name: body.name, 
       email: body.email, 
@@ -85,7 +89,9 @@ export async function POST(request: NextRequest) {
       hasPassword: !!body.password,
       hasConfirmPassword: !!body.confirmPassword,
       passwordType: typeof body.password,
-      confirmPasswordType: typeof body.confirmPassword
+      confirmPasswordType: typeof body.confirmPassword,
+      hasPasswordLength,
+      hasConfirmPasswordLength
     });
     
     // レート制限チェック（IPアドレスまたはメールアドレスで制限）
@@ -96,6 +102,23 @@ export async function POST(request: NextRequest) {
       return standardErrors.rateLimitExceeded();
     }
     
+    // passwordLengthが送信されている場合の特別なチェック（最優先）
+    if ('passwordLength' in body || 'confirmPasswordLength' in body) {
+      console.error('警告: passwordLengthフィールドが検出されました。ブラウザ拡張機能やセキュリティソフトが干渉している可能性があります。');
+      console.error('受信したデータ:', body);
+      return errorResponse(
+        'セキュリティソフトやブラウザ拡張機能がパスワードの送信を妨げています。拡張機能を無効にするか、別のブラウザでお試しください。', 
+        'PASSWORD_BLOCKED',
+        400,
+        {
+          receivedFields: Object.keys(body),
+          expectedFields: ['name', 'email', 'password', 'confirmPassword'],
+          suggestion: 'ブラウザの拡張機能（特にパスワードマネージャーやセキュリティ拡張機能）を一時的に無効にしてください。',
+          receivedData: body
+        }
+      );
+    }
+    
     // パスワードフィールドの存在チェック
     if (!body.password || typeof body.password !== 'string') {
       console.error('パスワードフィールドが不正:', {
@@ -104,21 +127,6 @@ export async function POST(request: NextRequest) {
         receivedKeys: Object.keys(body),
         receivedData: body
       });
-      
-      // passwordLengthが送信されている場合の特別なエラーメッセージ
-      if ('passwordLength' in body || 'confirmPasswordLength' in body) {
-        console.error('警告: passwordLengthフィールドが検出されました。ブラウザ拡張機能やセキュリティソフトが干渉している可能性があります。');
-        return errorResponse(
-          'セキュリティソフトやブラウザ拡張機能がパスワードの送信を妨げています。拡張機能を無効にするか、別のブラウザでお試しください。', 
-          'PASSWORD_BLOCKED',
-          400,
-          {
-            receivedFields: Object.keys(body),
-            expectedFields: ['name', 'email', 'password', 'confirmPassword'],
-            suggestion: 'ブラウザの拡張機能（特にパスワードマネージャーやセキュリティ拡張機能）を一時的に無効にしてください。'
-          }
-        );
-      }
       
       return errorResponse(
         'パスワードが送信されていません。ブラウザを更新して再度お試しください。', 
@@ -277,7 +285,16 @@ export async function POST(request: NextRequest) {
       );
     }
   } catch (error) {
-    console.error('登録エラーの詳細:', error);
+    console.error('=== 登録エラーの詳細 ===');
+    console.error('エラーオブジェクト:', error);
+    console.error('エラータイプ:', typeof error);
+    console.error('エラー名:', error instanceof Error ? error.name : 'Unknown');
+    console.error('エラーメッセージ:', error instanceof Error ? error.message : String(error));
+    
+    // スタックトレースを取得
+    if (error instanceof Error && error.stack) {
+      console.error('スタックトレース:', error.stack);
+    }
     
     // MongoDBエラーの処理
     if (error && typeof error === 'object' && 'code' in error) {
@@ -293,11 +310,14 @@ export async function POST(request: NextRequest) {
     // 詳細なエラー情報をログに出力
     let errorMessage = 'ユーザー登録に失敗しました';
     let statusCode = 500;
-    const errorDetails: any = {};
+    const errorDetails: any = {
+      error: error instanceof Error ? error.message : String(error),
+      name: error instanceof Error ? error.name : 'Unknown',
+      stack: error instanceof Error ? error.stack : undefined,
+    };
     
     if (error instanceof Error) {
       errorMessage = error.message;
-      errorDetails.stack = error.stack;
       
       // MongoDB接続エラーの場合
       if (error.message.includes('MONGODB_URI') || error.message.includes('connect')) {
@@ -305,7 +325,7 @@ export async function POST(request: NextRequest) {
         errorDetails.type = 'DATABASE_CONNECTION_ERROR';
         statusCode = 503;
       }
-      // メール設定エラーの場合（これはもう発生しないはず）
+      // メール設定エラーの場合
       else if (error.message.includes('credentials not configured')) {
         errorMessage = 'メール設定エラー';
         errorDetails.type = 'EMAIL_CONFIGURATION_ERROR';
@@ -318,9 +338,10 @@ export async function POST(request: NextRequest) {
       }
     }
     
+    console.error('=== エラーレスポンス準備 ===');
     console.error('エラータイプ:', errorDetails.type || 'UNKNOWN');
     console.error('エラーメッセージ:', errorMessage);
-    console.error('スタックトレース:', errorDetails.stack);
+    console.error('ステータスコード:', statusCode);
     
     // 開発環境では詳細なエラーを返す
     if (process.env.NODE_ENV === 'development') {
