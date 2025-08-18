@@ -134,7 +134,12 @@ function RegisterContent() {
         confirmPassword: data.confirmPassword,
       };
       
-      console.log('APIリクエスト送信:', requestBody);
+      console.log('APIリクエスト送信:', {
+        name: requestBody.name,
+        email: requestBody.email,
+        passwordLength: requestBody.password?.length,
+        confirmPasswordLength: requestBody.confirmPassword?.length
+      });
       
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -152,7 +157,7 @@ function RegisterContent() {
       const result = await response.json();
       console.log('APIレスポンス内容:', result);
 
-      if (!response.ok) {
+      if (!result.ok) {
         if (mountedRef.current) {
           if (result.details) {
             safeSetState(() => {
