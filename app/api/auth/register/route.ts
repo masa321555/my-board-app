@@ -251,7 +251,6 @@ export async function POST(request: NextRequest) {
     }
 
     // メール送信に失敗した場合は202、成功した場合は201を返す
-    const statusCode = emailSent ? 201 : 202;
     const message = emailSent
       ? '登録が完了しました。確認メールをご確認ください。'
       : isDevelopment 

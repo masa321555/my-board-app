@@ -24,7 +24,7 @@ export default function SimpleRegisterTestPage() {
       <h2>現在の問題</h2>
       <p>
         ブラウザ拡張機能やセキュリティソフトウェアが、パスワードフィールドを
-        <code>password: "実際の値"</code> から <code>passwordLength: 12</code> に
+        <code>password: &quot;実際の値&quot;</code> から <code>passwordLength: 12</code> に
         変換しているため、サーバー側でパスワードを受け取れません。
       </p>
     </div>
