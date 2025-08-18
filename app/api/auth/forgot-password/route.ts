@@ -5,6 +5,9 @@ import User from '@/models/User';
 import emailService from '@/services/email/emailService';
 import { TokenUtils } from '@/utils/tokenUtils';
 
+// Edge Runtimeではnodemailerが動作しないため、Node.js Runtimeを使用
+export const runtime = 'nodejs';
+
 const forgotPasswordSchema = z.object({
   email: z.string().email('有効なメールアドレスを入力してください'),
 });
