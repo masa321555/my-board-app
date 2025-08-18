@@ -127,12 +127,24 @@ function RegisterContent() {
     isSubmittingRef.current = true;
 
     try {
+      // React Hook Formから取得したデータを確認
+      console.log('=== React Hook Form data ===');
+      console.log('data object keys:', Object.keys(data));
+      console.log('data.password exists:', 'password' in data);
+      console.log('data.password value:', data.password);
+      console.log('data.confirmPassword exists:', 'confirmPassword' in data);
+      console.log('data.confirmPassword value:', data.confirmPassword);
+      
       const requestBody = {
         name: data.name,
         email: data.email,
         password: data.password,
         confirmPassword: data.confirmPassword,
       };
+      
+      console.log('requestBody object keys:', Object.keys(requestBody));
+      console.log('requestBody.password exists:', 'password' in requestBody);
+      console.log('requestBody.password value:', requestBody.password);
       
       console.log('APIリクエスト送信:', {
         name: requestBody.name,
@@ -142,22 +154,69 @@ function RegisterContent() {
       });
       
       // 実際に送信するデータを再確認
-      const bodyToSend = JSON.stringify({
+      const dataToSend = {
         name: data.name,
         email: data.email,
         password: data.password,
         confirmPassword: data.confirmPassword,
-      });
+      };
       
-      console.log('実際の送信データ:', bodyToSend);
+      console.log('送信データ（オブジェクト）:', dataToSend);
+      console.log('dataオブジェクトの内容:', data);
+      console.log('passwordフィールドの値:', data.password);
+      console.log('passwordフィールドの型:', typeof data.password);
       
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: bodyToSend,
-      });
+      const bodyToSend = JSON.stringify(dataToSend);
+      console.log('実際の送信データ（JSON文字列）:', bodyToSend);
+      
+      // fetchのラッパーで実際に送信されるデータを確認
+      console.log('=== FETCH開始 ===');
+      console.log('URL:', '/api/auth/register');
+      console.log('Method:', 'POST');
+      console.log('Headers:', { 'Content-Type': 'application/json' });
+      console.log('Body:', bodyToSend);
+      
+      // fetchの代わりにXMLHttpRequestを使用してテスト
+      const useXHR = false; // true に変更してXHRを使用
+      
+      let response;
+      if (useXHR) {
+        console.log('=== XMLHttpRequest使用 ===');
+        response = await new Promise<Response>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', '/api/auth/register', true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          
+          xhr.onload = () => {
+            const res = {
+              ok: xhr.status >= 200 && xhr.status < 300,
+              status: xhr.status,
+              statusText: xhr.statusText,
+              json: async () => JSON.parse(xhr.responseText),
+            } as Response;
+            resolve(res);
+          };
+          
+          xhr.onerror = () => reject(new Error('XHR failed'));
+          console.log('XHR sending body:', bodyToSend);
+          xhr.send(bodyToSend);
+        });
+      } else {
+        // 通常のfetchを使用
+        console.log('=== 通常のfetch使用 ===');
+        
+        // fetchをラップして実際の送信内容を確認
+        const originalFetch = window.fetch;
+        response = await originalFetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: bodyToSend,
+        });
+      }
+      
+      console.log('=== リクエスト完了 ===');
 
       console.log('APIレスポンス受信:', { 
         status: response.status, 
@@ -169,9 +228,18 @@ function RegisterContent() {
 
       if (!result.ok) {
         if (mountedRef.current) {
-          if (result.details) {
+          // エラーメッセージの表示
+          const errorMessage = result.error || '登録に失敗しました';
+          
+          // パスワードブロックエラーの特別な処理
+          if (result.code === 'PASSWORD_BLOCKED' && result.details?.suggestion) {
             safeSetState(() => {
-              setServerError(result.error);
+              setServerError(`${errorMessage}\n\n${result.details.suggestion}`);
+            });
+          } else if (result.details) {
+            safeSetState(() => {
+              setServerError(errorMessage);
+              // パスワード強度の提案がある場合
               if (result.details.suggestions) {
                 setPasswordStrength({
                   ...passwordStrength,
@@ -181,9 +249,10 @@ function RegisterContent() {
             });
           } else {
             safeSetState(() => {
-              setServerError(result.error || '登録に失敗しました');
+              setServerError(errorMessage);
             });
           }
+          
           safeSetState(() => {
             setIsSubmitting(false);
           });
@@ -193,8 +262,10 @@ function RegisterContent() {
       }
 
       if (mountedRef.current) {
+        // 成功メッセージの表示
+        const successMessage = result.message || '登録が完了しました';
         safeSetState(() => {
-          setSuccessMessage(result.message);
+          setSuccessMessage(successMessage);
           setIsNavigating(true);
         });
         

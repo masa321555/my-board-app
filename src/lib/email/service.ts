@@ -60,69 +60,103 @@ export class EmailService {
 
   // メール送信
   async send(options: EmailOptions): Promise<EmailResponse> {
-    try {
-      // レート制限チェック
-      const rateLimitKey = Array.isArray(options.to) ? options.to[0] : options.to;
-      const canSend = await this.checkRateLimit(rateLimitKey);
-      
-      if (!canSend) {
-        return {
-          success: false,
-          error: 'Rate limit exceeded. Please try again later.',
-        };
-      }
-
-      // HTMLコンテンツを生成
-      const html = await this.renderTemplate(options.template, options.data);
-
-      // メールクライアントを取得
-      const transporter = await getEmailClient();
-
-      // メール送信
-      const fromAddress = process.env.EMAIL_FROM || process.env.MAIL_FROM_ADDRESS || '"会員制掲示板" <noreply@myboard321.site>';
-      
-      console.log('Sending email with config:', {
-        from: fromAddress,
-        to: options.to,
-        subject: options.subject,
-        templateUsed: options.template
-      });
-      
-      const result = await transporter.sendMail({
-        from: fromAddress,
-        to: options.to,
-        subject: options.subject,
-        html,
-        attachments: options.attachments,
-      });
-
-      console.log('Email sent successfully:', {
-        messageId: result.messageId,
-        accepted: result.accepted,
-        rejected: result.rejected,
-        response: result.response
-      });
-      
-      // Ethereal Email の場合、プレビューURLを表示
-      if (process.env.EMAIL_PROVIDER === 'ethereal') {
-        const previewUrl = nodemailer.getTestMessageUrl(result);
-        if (previewUrl) {
-          console.log('Preview URL:', previewUrl);
+    // リトライ設定
+    const maxRetries = 3;
+    const retryDelay = 1000; // 1秒
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        // レート制限チェック
+        const rateLimitKey = Array.isArray(options.to) ? options.to[0] : options.to;
+        const canSend = await this.checkRateLimit(rateLimitKey);
+        
+        if (!canSend) {
+          return {
+            success: false,
+            error: 'Rate limit exceeded. Please try again later.',
+          };
         }
+
+        // HTMLコンテンツを生成
+        const html = await this.renderTemplate(options.template, options.data);
+
+        // メールクライアントを取得
+        const transporter = await getEmailClient();
+
+        // メール送信
+        const fromAddress = process.env.EMAIL_FROM || process.env.MAIL_FROM_ADDRESS || '"会員制掲示板" <noreply@myboard321.site>';
+        
+        console.log(`[Email Attempt ${attempt}/${maxRetries}] Sending email with config:`, {
+          from: fromAddress,
+          to: options.to,
+          subject: options.subject,
+          templateUsed: options.template,
+          attempt,
+        });
+        
+        const result = await transporter.sendMail({
+          from: fromAddress,
+          to: options.to,
+          subject: options.subject,
+          html,
+          attachments: options.attachments,
+        });
+
+        console.log('Email sent successfully:', {
+          messageId: result.messageId,
+          accepted: result.accepted,
+          rejected: result.rejected,
+          response: result.response,
+          attempts: attempt,
+        });
+        
+        // Ethereal Email の場合、プレビューURLを表示
+        if (process.env.EMAIL_PROVIDER === 'ethereal') {
+          const previewUrl = nodemailer.getTestMessageUrl(result);
+          if (previewUrl) {
+            console.log('Preview URL:', previewUrl);
+          }
+        }
+        
+        return {
+          success: true,
+          messageId: result.messageId,
+        };
+      } catch (error) {
+        console.error(`[Email Attempt ${attempt}/${maxRetries}] Email send error:`, error);
+        
+        // 最後の試行の場合、またはリトライ不可能なエラーの場合
+        if (attempt === maxRetries || this.isNonRetryableError(error)) {
+          return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to send email',
+          };
+        }
+        
+        // リトライ前に待機
+        console.log(`Retrying in ${retryDelay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, retryDelay * attempt));
       }
-      
-      return {
-        success: true,
-        messageId: result.messageId,
-      };
-    } catch (error) {
-      console.error('Email send error:', error);
-      
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to send email',
-      };
     }
+    
+    // ここには到達しないはずだが、念のため
+    return {
+      success: false,
+      error: 'Maximum retry attempts exceeded',
+    };
+  }
+
+  // リトライ不可能なエラーかどうかを判定
+  private isNonRetryableError(error: unknown): boolean {
+    if (error instanceof Error) {
+      const message = error.message.toLowerCase();
+      // 認証エラー、無効なアドレスなどはリトライしない
+      return message.includes('auth') || 
+             message.includes('invalid') || 
+             message.includes('credentials') ||
+             message.includes('authentication');
+    }
+    return false;
   }
 
   // ウェルカムメール送信

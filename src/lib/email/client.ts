@@ -175,7 +175,7 @@ export async function getEmailClient(): Promise<Transporter> {
         from: process.env.EMAIL_FROM || process.env.MAIL_FROM_ADDRESS
       });
 
-      transporter = nodemailer.createTransport({
+      const smtpOptions: SMTPTransport.Options = {
         host: smtpHost,
         port: smtpPort,
         secure: smtpSecure,
@@ -187,12 +187,13 @@ export async function getEmailClient(): Promise<Transporter> {
           // 開発環境では証明書の検証をスキップ
           rejectUnauthorized: process.env.NODE_ENV === 'production',
         },
-        pool: true,
-        maxConnections: 5,
-        maxMessages: 100,
-        rateDelta: 1000,
-        rateLimit: 5,
-      });
+        // タイムアウト設定
+        connectionTimeout: 30000, // 30秒
+        greetingTimeout: 15000, // 15秒
+        socketTimeout: 45000, // 45秒
+      };
+      
+      transporter = nodemailer.createTransport(smtpOptions);
       break;
   }
 

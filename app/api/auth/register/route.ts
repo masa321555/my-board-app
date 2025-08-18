@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import dbConnect from '@/lib/db';
@@ -8,6 +8,7 @@ import { TokenUtils } from '@/utils/tokenUtils';
 import { registerSchema } from '@/schemas/auth';
 import { checkPasswordStrength } from '@/utils/passwordStrength';
 import { normalizeUser } from '@/utils/dataTransform';
+import { successResponse, errorResponse, standardErrors, checkRequiredEnvVars, missingEnvVarsResponse } from '@/utils/apiResponse';
 
 // Edge Runtimeではnodemailer/bcryptjsが動作しないため、Node.js Runtimeを使用
 export const runtime = 'nodejs';
@@ -41,6 +42,12 @@ function checkRateLimit(identifier: string): boolean {
 export async function POST(request: NextRequest) {
   const isDevelopment = process.env.NODE_ENV === 'development';
   
+  // 必須環境変数チェック
+  const envCheck = checkRequiredEnvVars(['MONGODB_URI', 'JWT_SECRET']);
+  if (!envCheck.allPresent) {
+    return missingEnvVarsResponse(envCheck.missing);
+  }
+  
   if (isDevelopment) {
     console.log('=== 登録API開始 ===');
     console.log('環境変数チェック:', {
@@ -55,10 +62,7 @@ export async function POST(request: NextRequest) {
     // Content-Typeチェック
     const contentType = request.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
-      return NextResponse.json(
-        { ok: false, error: 'Content-Type must be application/json' },
-        { status: 400 }
-      );
+      return standardErrors.badRequest('Content-Type must be application/json');
     }
     // リクエストボディの取得（JSON解析エラーをキャッチ）
     let body;
@@ -66,10 +70,7 @@ export async function POST(request: NextRequest) {
       body = await request.json();
     } catch (parseError) {
       console.error('リクエストボディのJSON解析エラー:', parseError);
-      return NextResponse.json(
-        { ok: false, error: '不正なリクエスト形式です', code: 'INVALID_JSON' },
-        { status: 400 }
-      );
+      return errorResponse('不正なリクエスト形式です', 'INVALID_JSON', 400);
     }
     
     // 受信したボディの詳細をログ出力
@@ -92,10 +93,7 @@ export async function POST(request: NextRequest) {
     const rateLimitKey = body.email || clientIp;
     
     if (!checkRateLimit(rateLimitKey)) {
-      return NextResponse.json(
-        { ok: false, error: 'リクエストが多すぎます。しばらく待ってから再度お試しください。', code: 'RATE_LIMIT_EXCEEDED' },
-        { status: 429 }
-      );
+      return standardErrors.rateLimitExceeded();
     }
     
     // パスワードフィールドの存在チェック
@@ -103,19 +101,33 @@ export async function POST(request: NextRequest) {
       console.error('パスワードフィールドが不正:', {
         hasPassword: !!body.password,
         passwordType: typeof body.password,
-        receivedKeys: Object.keys(body)
+        receivedKeys: Object.keys(body),
+        receivedData: body
       });
-      return NextResponse.json(
-        { 
-          ok: false, 
-          error: 'パスワードが送信されていません。ブラウザを更新して再度お試しください。', 
-          code: 'MISSING_PASSWORD',
-          details: {
+      
+      // passwordLengthが送信されている場合の特別なエラーメッセージ
+      if ('passwordLength' in body || 'confirmPasswordLength' in body) {
+        console.error('警告: passwordLengthフィールドが検出されました。ブラウザ拡張機能やセキュリティソフトが干渉している可能性があります。');
+        return errorResponse(
+          'セキュリティソフトやブラウザ拡張機能がパスワードの送信を妨げています。拡張機能を無効にするか、別のブラウザでお試しください。', 
+          'PASSWORD_BLOCKED',
+          400,
+          {
             receivedFields: Object.keys(body),
-            expectedFields: ['name', 'email', 'password', 'confirmPassword']
+            expectedFields: ['name', 'email', 'password', 'confirmPassword'],
+            suggestion: 'ブラウザの拡張機能（特にパスワードマネージャーやセキュリティ拡張機能）を一時的に無効にしてください。'
           }
-        },
-        { status: 400 }
+        );
+      }
+      
+      return errorResponse(
+        'パスワードが送信されていません。ブラウザを更新して再度お試しください。', 
+        'MISSING_PASSWORD',
+        400,
+        {
+          receivedFields: Object.keys(body),
+          expectedFields: ['name', 'email', 'password', 'confirmPassword']
+        }
       );
     }
     
@@ -127,17 +139,12 @@ export async function POST(request: NextRequest) {
     } catch (validationError) {
       if (validationError instanceof z.ZodError) {
         console.error('バリデーションエラー:', validationError.issues);
-        return NextResponse.json(
-          { 
-            ok: false,
-            error: 'バリデーションエラー', 
-            code: 'VALIDATION_ERROR',
-            details: validationError.issues.map((issue) => ({
-              field: issue.path.join('.'),
-              message: issue.message
-            }))
-          },
-          { status: 400 }
+        return standardErrors.validationError(
+          'バリデーションエラー',
+          validationError.issues.map((issue) => ({
+            field: issue.path.join('.'),
+            message: issue.message
+          }))
         );
       }
       throw validationError;
@@ -150,10 +157,7 @@ export async function POST(request: NextRequest) {
       console.log('MongoDB接続成功');
     } catch (dbError) {
       console.error('MongoDB接続エラー:', dbError);
-      return NextResponse.json(
-        { ok: false, error: 'データベース接続エラーが発生しました', code: 'DATABASE_CONNECTION_ERROR' },
-        { status: 503 }
-      );
+      return standardErrors.databaseError('データベース接続エラーが発生しました');
     }
 
     // 既存ユーザーチェック
@@ -161,10 +165,7 @@ export async function POST(request: NextRequest) {
     
     if (existingUser) {
       console.log('既存ユーザーが見つかりました:', validatedData.email);
-      return NextResponse.json(
-        { ok: false, error: 'このメールアドレスは既に登録されています', code: 'EMAIL_ALREADY_EXISTS' },
-        { status: 409 }
-      );
+      return standardErrors.conflict('このメールアドレスは既に登録されています');
     }
 
     // パスワード強度チェック
@@ -172,17 +173,14 @@ export async function POST(request: NextRequest) {
       // 本番環境でのみパスワード強度をチェック
       const passwordStrength = checkPasswordStrength(validatedData.password);
       if (!passwordStrength.isStrong) {
-        return NextResponse.json(
-          { 
-            ok: false,
-            error: 'パスワードが弱すぎます',
-            code: 'WEAK_PASSWORD',
-            details: {
-              feedback: passwordStrength.feedback,
-              suggestions: passwordStrength.suggestions,
-            }
-          },
-          { status: 401 }
+        return errorResponse(
+          'パスワードが弱すぎます',
+          'WEAK_PASSWORD',
+          400,
+          {
+            feedback: passwordStrength.feedback,
+            suggestions: passwordStrength.suggestions,
+          }
         );
       }
     }
@@ -252,18 +250,32 @@ export async function POST(request: NextRequest) {
         ? '登録が完了しました。開発環境のため、メール確認は自動的に完了しています。'
         : '登録が完了しました。確認メールの送信に失敗しましたが、後ほど再送信できます。';
 
-    return NextResponse.json(
-      {
-        ok: true,
+    // 固定化されたレスポンス仕様
+    const userData = {
+      id: normalizedUser.id,
+      email: normalizedUser.email,
+    };
+    
+    if (emailSent) {
+      // メール送信成功: 201 Created
+      return successResponse(
+        { user: userData },
         message,
-        user: {
-          id: normalizedUser.id,
-          email: normalizedUser.email,
-        },
-        emailSent,
-      },
-      { status: statusCode }
-    );
+        201,
+        { emailSent: true }
+      );
+    } else {
+      // メール送信失敗: 202 Accepted
+      return successResponse(
+        { user: userData },
+        message,
+        202,
+        { 
+          requiresEmailVerification: true,
+          emailSent: false 
+        }
+      );
+    }
   } catch (error) {
     console.error('登録エラーの詳細:', error);
     
@@ -274,10 +286,7 @@ export async function POST(request: NextRequest) {
       // E11000: 重複キーエラー
       if (mongoError.code === 11000) {
         console.log('重複キーエラー:', mongoError);
-        return NextResponse.json(
-          { ok: false, error: 'このメールアドレスは既に登録されています', code: 'EMAIL_ALREADY_EXISTS' },
-          { status: 409 }
-        );
+        return standardErrors.conflict('このメールアドレスは既に登録されています');
       }
     }
     
@@ -315,21 +324,15 @@ export async function POST(request: NextRequest) {
     
     // 開発環境では詳細なエラーを返す
     if (process.env.NODE_ENV === 'development') {
-      return NextResponse.json(
-        { 
-          ok: false,
-          error: errorMessage,
-          code: errorDetails.type || 'UNKNOWN_ERROR',
-          details: errorDetails
-        },
-        { status: statusCode }
+      return errorResponse(
+        errorMessage,
+        errorDetails.type || 'UNKNOWN_ERROR',
+        statusCode,
+        errorDetails
       );
     }
     
     // 本番環境では一般的なエラーメッセージを返す
-    return NextResponse.json(
-      { ok: false, error: 'ユーザー登録に失敗しました', code: 'REGISTRATION_FAILED' },
-      { status: statusCode }
-    );
+    return errorResponse('ユーザー登録に失敗しました', 'REGISTRATION_FAILED', statusCode);
   }
 }
