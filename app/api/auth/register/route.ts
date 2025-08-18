@@ -42,10 +42,29 @@ function checkRateLimit(identifier: string): boolean {
 export async function POST(request: NextRequest) {
   const isDevelopment = process.env.NODE_ENV === 'development';
   
-  // 必須環境変数チェック
-  const envCheck = checkRequiredEnvVars(['MONGODB_URI', 'JWT_SECRET']);
-  if (!envCheck.allPresent) {
-    return missingEnvVarsResponse(envCheck.missing);
+  // 必須環境変数チェック（DB関連は必須、メール関連は任意）
+  const requiredDbVars = ['MONGODB_URI'];
+  const optionalEmailVars = ['EMAIL_FROM', 'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'SENDGRID_API_KEY'];
+  
+  // DB関連の環境変数チェック（必須）
+  const dbEnvCheck = checkRequiredEnvVars(requiredDbVars);
+  if (!dbEnvCheck.allPresent) {
+    console.error('DB関連の必須環境変数が不足:', dbEnvCheck.missing);
+    return missingEnvVarsResponse(dbEnvCheck.missing);
+  }
+  
+  // 認証関連の環境変数チェック（JWT_SECRETまたはNEXTAUTH_SECRETのいずれかが必須）
+  const hasJwtSecret = !!process.env.JWT_SECRET || !!process.env.NEXTAUTH_SECRET;
+  if (!hasJwtSecret) {
+    console.error('認証関連の必須環境変数が不足: JWT_SECRETまたはNEXTAUTH_SECRETが必要です');
+    return missingEnvVarsResponse(['JWT_SECRET or NEXTAUTH_SECRET']);
+  }
+  
+  // メール関連の環境変数チェック（任意 - ログのみ）
+  const emailEnvCheck = checkRequiredEnvVars(optionalEmailVars);
+  const hasEmailConfig = emailEnvCheck.missing.length < optionalEmailVars.length;
+  if (!hasEmailConfig) {
+    console.warn('メール関連の環境変数が設定されていません。メール送信機能は無効になります。');
   }
   
   if (isDevelopment) {
@@ -54,8 +73,21 @@ export async function POST(request: NextRequest) {
       NODE_ENV: process.env.NODE_ENV,
       MONGODB_URI: !!process.env.MONGODB_URI,
       JWT_SECRET: !!process.env.JWT_SECRET,
-      EMAIL_PROVIDER: process.env.EMAIL_PROVIDER
+      NEXTAUTH_SECRET: !!process.env.NEXTAUTH_SECRET,
+      EMAIL_PROVIDER: process.env.EMAIL_PROVIDER,
+      EMAIL_FROM: !!process.env.EMAIL_FROM,
+      SMTP_HOST: !!process.env.SMTP_HOST,
+      SENDGRID_API_KEY: !!process.env.SENDGRID_API_KEY,
+      APP_URL: process.env.APP_URL,
+      VERCEL_URL: process.env.VERCEL_URL
     });
+    console.log('DB環境変数チェック結果:', dbEnvCheck);
+    console.log('認証環境変数チェック結果:', {
+      hasJwtSecret,
+      JWT_SECRET: !!process.env.JWT_SECRET,
+      NEXTAUTH_SECRET: !!process.env.NEXTAUTH_SECRET
+    });
+    console.log('メール環境変数チェック結果:', emailEnvCheck);
   }
   
   try {

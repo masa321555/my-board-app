@@ -8,6 +8,15 @@ interface TokenPayload {
 }
 
 export class TokenUtils {
+  // JWTシークレットの取得（JWT_SECRETまたはNEXTAUTH_SECRETを使用）
+  private static getJwtSecret(): string {
+    const secret = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET;
+    if (!secret) {
+      throw new Error('JWT_SECRET or NEXTAUTH_SECRET must be defined');
+    }
+    return secret;
+  }
+
   // メール確認用トークンの生成
   static generateEmailConfirmationToken(userId: string, email: string): string {
     const payload: TokenPayload = {
@@ -16,7 +25,7 @@ export class TokenUtils {
       type: 'email-confirmation'
     };
     
-    return jwt.sign(payload, process.env.JWT_SECRET!, {
+    return jwt.sign(payload, this.getJwtSecret(), {
       expiresIn: '24h'
     } as jwt.SignOptions);
   }
@@ -29,7 +38,7 @@ export class TokenUtils {
       type: 'password-reset'
     };
     
-    return jwt.sign(payload, process.env.JWT_SECRET!, {
+    return jwt.sign(payload, this.getJwtSecret(), {
       expiresIn: process.env.PASSWORD_RESET_TOKEN_EXPIRES_IN || '1h'
     } as jwt.SignOptions);
   }
@@ -37,7 +46,7 @@ export class TokenUtils {
   // トークンの検証
   static verifyToken(token: string): TokenPayload {
     try {
-      return jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload;
+      return jwt.verify(token, this.getJwtSecret()) as TokenPayload;
     } catch (_error) {
       throw new Error('無効なトークンです');
     }

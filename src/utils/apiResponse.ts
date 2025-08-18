@@ -106,10 +106,14 @@ export function checkRequiredEnvVars(
 
 // 環境変数不足エラーレスポンス
 export function missingEnvVarsResponse(missingVars: string[]): NextResponse<ApiErrorResponse> {
+  console.error('必要な環境変数が不足しています:', missingVars);
   return errorResponse(
     '必要な環境変数が設定されていません',
     'CONFIGURATION_ERROR',
     503,
-    { missingVars }
+    { 
+      missing: missingVars,
+      message: 'サーバーの設定が不完全です。管理者にお問い合わせください。'
+    }
   );
 }

@@ -131,9 +131,9 @@ function RegisterContent() {
       console.log('=== React Hook Form data ===');
       console.log('data object keys:', Object.keys(data));
       console.log('data.password exists:', 'password' in data);
-      console.log('data.password value:', data.password);
+      console.log('data.password length:', data.password?.length || 0);
       console.log('data.confirmPassword exists:', 'confirmPassword' in data);
-      console.log('data.confirmPassword value:', data.confirmPassword);
+      console.log('data.confirmPassword length:', data.confirmPassword?.length || 0);
       
       const requestBody = {
         name: data.name,
@@ -144,7 +144,7 @@ function RegisterContent() {
       
       console.log('requestBody object keys:', Object.keys(requestBody));
       console.log('requestBody.password exists:', 'password' in requestBody);
-      console.log('requestBody.password value:', requestBody.password);
+      console.log('requestBody.password length:', requestBody.password?.length || 0);
       
       console.log('APIリクエスト送信:', {
         name: requestBody.name,
@@ -161,9 +161,17 @@ function RegisterContent() {
         confirmPassword: data.confirmPassword,
       };
       
-      console.log('送信データ（オブジェクト）:', dataToSend);
-      console.log('dataオブジェクトの内容:', data);
-      console.log('passwordフィールドの値:', data.password);
+      console.log('送信データ（オブジェクト）:', {
+        ...dataToSend,
+        password: '[REDACTED]',
+        confirmPassword: '[REDACTED]'
+      });
+      console.log('dataオブジェクトの内容:', {
+        ...data,
+        password: '[REDACTED]',
+        confirmPassword: '[REDACTED]'
+      });
+      console.log('passwordフィールドの長さ:', data.password?.length || 0);
       console.log('passwordフィールドの型:', typeof data.password);
       
       const bodyToSend = JSON.stringify(dataToSend);
@@ -235,6 +243,14 @@ function RegisterContent() {
           if (result.code === 'PASSWORD_BLOCKED' && result.details?.suggestion) {
             safeSetState(() => {
               setServerError(`${errorMessage}\n\n${result.details.suggestion}`);
+            });
+          } else if (result.code === 'CONFIGURATION_ERROR') {
+            // 環境変数エラーの特別な処理
+            safeSetState(() => {
+              setServerError(
+                '現在、システムメンテナンス中のため新規登録を一時停止しています。\n' +
+                '恐れ入りますが、しばらく時間をおいてから再度お試しください。'
+              );
             });
           } else if (result.details) {
             safeSetState(() => {
