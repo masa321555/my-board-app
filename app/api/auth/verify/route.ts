@@ -4,6 +4,9 @@ import User from '@/models/User.model';
 import { TokenUtils } from '@/utils/tokenUtils';
 import { emailService } from '@/lib/email/service';
 
+// Edge Runtimeではnodemailerが動作しないため、Node.js Runtimeを使用
+export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
   try {
     const { token } = await request.json();

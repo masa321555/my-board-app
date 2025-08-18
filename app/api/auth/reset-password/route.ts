@@ -5,6 +5,9 @@ import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import { TokenUtils } from '@/utils/tokenUtils';
 
+// Edge Runtimeではbcryptjsが動作しないため、Node.js Runtimeを使用
+export const runtime = 'nodejs';
+
 const resetPasswordSchema = z.object({
   token: z.string(),
   password: z.string().min(6, 'パスワードは6文字以上で入力してください'),

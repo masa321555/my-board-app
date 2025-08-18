@@ -6,6 +6,9 @@ import User from '@/models/User.model';
 import { emailService } from '@/lib/email/service';
 import { TokenUtils } from '@/utils/tokenUtils';
 
+// Edge Runtimeではnodemailerが動作しないため、Node.js Runtimeを使用
+export const runtime = 'nodejs';
+
 // レート制限のマップ（本番環境ではRedisを使用）
 const rateLimitMap = new Map<string, { count: number; resetAt: Date }>();
 
