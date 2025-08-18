@@ -166,19 +166,21 @@ export async function POST(request: NextRequest) {
         (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
       const verificationUrl = `${appUrl}/api/auth/verify?token=${confirmationToken}`;
       
-      // 開発環境ではメール送信をスキップ
-      if (isDevelopment) {
-        console.log('開発環境: メール送信をスキップしました');
-        console.log('確認URL:', verificationUrl);
-        emailSent = false;
+      // メール送信を試行
+      console.log('メール送信を試行中...');
+      const emailResult = await emailService.sendVerificationEmail(user.email, {
+        name: user.name,
+        verificationUrl,
+      });
+      emailSent = emailResult.success;
+      
+      if (emailSent) {
+        console.log('メール送信成功');
       } else {
-        const emailResult = await emailService.sendVerificationEmail(user.email, {
-          name: user.name,
-          verificationUrl,
-        });
-        emailSent = emailResult.success;
-        if (!emailSent) {
-          console.error('メール送信失敗:', emailResult.error);
+        console.error('メール送信失敗:', emailResult.error);
+        // 開発環境では確認URLをコンソールに出力
+        if (isDevelopment) {
+          console.log('開発環境: 確認URL:', verificationUrl);
         }
       }
     } catch (emailError) {
@@ -194,10 +196,10 @@ export async function POST(request: NextRequest) {
 
     // メール送信に失敗した場合は202、成功した場合は201を返す
     const statusCode = emailSent ? 201 : 202;
-    const message = isDevelopment 
-      ? '登録が完了しました。開発環境のため、メール確認は自動的に完了しています。'
-      : emailSent
-        ? '登録が完了しました。確認メールをご確認ください。'
+    const message = emailSent
+      ? '登録が完了しました。確認メールをご確認ください。'
+      : isDevelopment 
+        ? '登録が完了しました。開発環境のため、メール確認は自動的に完了しています。'
         : '登録が完了しました。確認メールの送信に失敗しましたが、後ほど再送信できます。';
 
     return NextResponse.json(

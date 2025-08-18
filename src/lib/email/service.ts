@@ -1,4 +1,5 @@
 import { render } from '@react-email/render';
+import nodemailer from 'nodemailer';
 import { getEmailClient } from './client';
 import { EmailOptions, EmailResponse, EmailTemplate } from '@/types/email';
 import WelcomeEmail from '@/emails/templates/WelcomeEmail';
@@ -75,17 +76,41 @@ export class EmailService {
       const html = await this.renderTemplate(options.template, options.data);
 
       // メールクライアントを取得
-      const transporter = getEmailClient();
+      const transporter = await getEmailClient();
 
       // メール送信
+      const fromAddress = process.env.EMAIL_FROM || process.env.MAIL_FROM_ADDRESS || '"会員制掲示板" <noreply@myboard321.site>';
+      
+      console.log('Sending email with config:', {
+        from: fromAddress,
+        to: options.to,
+        subject: options.subject,
+        templateUsed: options.template
+      });
+      
       const result = await transporter.sendMail({
-        from: process.env.EMAIL_FROM || '"会員制掲示板" <noreply@example.com>',
+        from: fromAddress,
         to: options.to,
         subject: options.subject,
         html,
         attachments: options.attachments,
       });
 
+      console.log('Email sent successfully:', {
+        messageId: result.messageId,
+        accepted: result.accepted,
+        rejected: result.rejected,
+        response: result.response
+      });
+      
+      // Ethereal Email の場合、プレビューURLを表示
+      if (process.env.EMAIL_PROVIDER === 'ethereal') {
+        const previewUrl = nodemailer.getTestMessageUrl(result);
+        if (previewUrl) {
+          console.log('Preview URL:', previewUrl);
+        }
+      }
+      
       return {
         success: true,
         messageId: result.messageId,

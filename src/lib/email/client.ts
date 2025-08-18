@@ -49,22 +49,53 @@ function createDummyTransporter(context: string): Transporter {
   return dummyTransporter as Transporter;
 }
 
-export function getEmailClient(): Transporter {
+export async function getEmailClient(): Promise<Transporter> {
   if (transporter) {
     return transporter;
   }
 
   // メール設定がされていない場合の処理
-  const emailProvider = process.env.EMAIL_PROVIDER || 'smtp';
+  // EMAIL_PROVIDERが未設定の場合、MAIL_HOSTがあればsmtpとして扱う
+  let emailProvider = process.env.EMAIL_PROVIDER;
   
-  // メール設定が存在しない場合、ダミートランスポーターを返す
-  if (!process.env.EMAIL_PROVIDER && !process.env.MAIL_HOST && !process.env.GMAIL_USER && !process.env.YAHOO_USER) {
+  // EMAIL_PROVIDERが未設定でもMAIL_HOSTがあればSMTPとして扱う
+  if (!emailProvider && process.env.MAIL_HOST) {
+    emailProvider = 'smtp';
+    console.log('EMAIL_PROVIDER not set, but MAIL_HOST found. Using SMTP provider.');
+  }
+  
+  // デフォルトはsmtp
+  emailProvider = emailProvider || 'smtp';
+  
+  // メール設定が全く存在しない場合、ダミートランスポーターを返す
+  if (!process.env.MAIL_HOST && !process.env.GMAIL_USER && !process.env.YAHOO_USER) {
     console.warn('No email configuration found. Email sending will be disabled.');
     transporter = createDummyTransporter('no-config');
     return transporter;
   }
   
   switch (emailProvider.toLowerCase()) {
+    case 'ethereal':
+      // Ethereal Email for development testing
+      console.log('Using Ethereal Email for testing');
+      
+      // Create a test account using Ethereal
+      const testAccount = await nodemailer.createTestAccount();
+      
+      transporter = nodemailer.createTransport({
+        host: 'smtp.ethereal.email',
+        port: 587,
+        secure: false,
+        auth: {
+          user: testAccount.user,
+          pass: testAccount.pass,
+        },
+      });
+      
+      console.log('Ethereal test account created:', testAccount.user);
+      console.log('View sent emails at: https://ethereal.email/messages');
+      break;
+      
     case 'gmail':
       const gmailUser = process.env.GMAIL_USER;
       const gmailPassword = process.env.GMAIL_APP_PASSWORD;
@@ -124,9 +155,25 @@ export function getEmailClient(): Transporter {
 
       if (!smtpHost || !smtpUser || !smtpPass) {
         console.error('SMTP credentials not configured. Please set MAIL_HOST, MAIL_USER, and MAIL_PASS environment variables.');
+        console.error('Current environment variables:', {
+          MAIL_HOST: smtpHost,
+          MAIL_USER: smtpUser,
+          MAIL_PASS: smtpPass ? '[REDACTED]' : undefined,
+          MAIL_PORT: smtpPort,
+          EMAIL_PROVIDER: emailProvider
+        });
         transporter = createDummyTransporter('smtp-not-configured');
         return transporter;
       }
+
+      console.log('Creating SMTP transporter with config:', {
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpSecure,
+        user: smtpUser,
+        tls_rejectUnauthorized: process.env.NODE_ENV === 'production',
+        from: process.env.EMAIL_FROM || process.env.MAIL_FROM_ADDRESS
+      });
 
       transporter = nodemailer.createTransport({
         host: smtpHost,
@@ -137,6 +184,7 @@ export function getEmailClient(): Transporter {
           pass: smtpPass,
         },
         tls: {
+          // 開発環境では証明書の検証をスキップ
           rejectUnauthorized: process.env.NODE_ENV === 'production',
         },
         pool: true,
@@ -172,7 +220,11 @@ export function getEmailClient(): Transporter {
 // 接続をクローズする関数（アプリケーション終了時に使用）
 export async function closeEmailClient(): Promise<void> {
   if (transporter) {
-    await transporter.close();
+    try {
+      await transporter.close();
+    } catch (error) {
+      console.error('Error closing email transporter:', error);
+    }
     transporter = null;
   }
 }
