@@ -141,12 +141,22 @@ function RegisterContent() {
         confirmPasswordLength: requestBody.confirmPassword?.length
       });
       
+      // 実際に送信するデータを再確認
+      const bodyToSend = JSON.stringify({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+      });
+      
+      console.log('実際の送信データ:', bodyToSend);
+      
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestBody),
+        body: bodyToSend,
       });
 
       console.log('APIレスポンス受信:', { 

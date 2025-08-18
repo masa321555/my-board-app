@@ -39,13 +39,17 @@ function checkRateLimit(identifier: string): boolean {
 }
 
 export async function POST(request: NextRequest) {
-  console.log('=== 登録API開始 ===');
-  console.log('NODE_ENV:', process.env.NODE_ENV);
-  console.log('MONGODB_URI 設定:', !!process.env.MONGODB_URI);
-  console.log('JWT_SECRET 設定:', !!process.env.JWT_SECRET);
-  console.log('APP_URL:', process.env.APP_URL);
-  console.log('VERCEL_URL:', process.env.VERCEL_URL);
-  console.log('EMAIL_PROVIDER:', process.env.EMAIL_PROVIDER);
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  if (isDevelopment) {
+    console.log('=== 登録API開始 ===');
+    console.log('環境変数チェック:', {
+      NODE_ENV: process.env.NODE_ENV,
+      MONGODB_URI: !!process.env.MONGODB_URI,
+      JWT_SECRET: !!process.env.JWT_SECRET,
+      EMAIL_PROVIDER: process.env.EMAIL_PROVIDER
+    });
+  }
   
   try {
     // Content-Typeチェック
@@ -68,12 +72,19 @@ export async function POST(request: NextRequest) {
       );
     }
     
+    // 受信したボディの詳細をログ出力
+    console.log('受信したボディのキー:', Object.keys(body));
+    console.log('受信した完全なボディ:', JSON.stringify(body, null, 2));
+    
     console.log('登録リクエスト受信:', { 
       name: body.name, 
       email: body.email, 
       passwordLength: body.password?.length,
       confirmPasswordLength: body.confirmPassword?.length,
-      hasConfirmPassword: !!body.confirmPassword
+      hasPassword: !!body.password,
+      hasConfirmPassword: !!body.confirmPassword,
+      passwordType: typeof body.password,
+      confirmPasswordType: typeof body.confirmPassword
     });
     
     // レート制限チェック（IPアドレスまたはメールアドレスで制限）
@@ -87,9 +98,50 @@ export async function POST(request: NextRequest) {
       );
     }
     
+    // パスワードフィールドの存在チェック
+    if (!body.password || typeof body.password !== 'string') {
+      console.error('パスワードフィールドが不正:', {
+        hasPassword: !!body.password,
+        passwordType: typeof body.password,
+        receivedKeys: Object.keys(body)
+      });
+      return NextResponse.json(
+        { 
+          ok: false, 
+          error: 'パスワードが送信されていません。ブラウザを更新して再度お試しください。', 
+          code: 'MISSING_PASSWORD',
+          details: {
+            receivedFields: Object.keys(body),
+            expectedFields: ['name', 'email', 'password', 'confirmPassword']
+          }
+        },
+        { status: 400 }
+      );
+    }
+    
     // バリデーション
-    const validatedData = registerSchema.parse(body);
-    console.log('バリデーション成功');
+    let validatedData;
+    try {
+      validatedData = registerSchema.parse(body);
+      console.log('バリデーション成功');
+    } catch (validationError) {
+      if (validationError instanceof z.ZodError) {
+        console.error('バリデーションエラー:', validationError.issues);
+        return NextResponse.json(
+          { 
+            ok: false,
+            error: 'バリデーションエラー', 
+            code: 'VALIDATION_ERROR',
+            details: validationError.issues.map((issue) => ({
+              field: issue.path.join('.'),
+              message: issue.message
+            }))
+          },
+          { status: 400 }
+        );
+      }
+      throw validationError;
+    }
 
     // MongoDB接続
     console.log('MongoDB接続開始...');
@@ -115,9 +167,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 開発環境ではパスワード強度チェックをスキップ
-    const isDevelopment = process.env.NODE_ENV === 'development';
-    
+    // パスワード強度チェック
     if (!isDevelopment) {
       // 本番環境でのみパスワード強度をチェック
       const passwordStrength = checkPasswordStrength(validatedData.password);
@@ -216,23 +266,6 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error('登録エラーの詳細:', error);
-    
-    // Zodバリデーションエラー
-    if (error instanceof z.ZodError) {
-      console.log('バリデーションエラー詳細:', error.issues);
-      return NextResponse.json(
-        { 
-          ok: false,
-          error: 'バリデーションエラー', 
-          code: 'VALIDATION_ERROR',
-          details: error.issues.map((issue) => ({
-            field: issue.path.join('.'),
-            message: issue.message
-          }))
-        },
-        { status: 400 }
-      );
-    }
     
     // MongoDBエラーの処理
     if (error && typeof error === 'object' && 'code' in error) {
