@@ -12,6 +12,32 @@ import { normalizeUser } from '@/utils/dataTransform';
 // Edge Runtimeではnodemailer/bcryptjsが動作しないため、Node.js Runtimeを使用
 export const runtime = 'nodejs';
 
+// レート制限用のMap（本番環境ではRedisを使用）
+const rateLimitMap = new Map<string, { count: number; resetAt: Date }>();
+
+function checkRateLimit(identifier: string): boolean {
+  const now = new Date();
+  const limit = 5; // 1時間に5回まで
+  const windowMs = 60 * 60 * 1000; // 1時間
+  
+  const record = rateLimitMap.get(identifier);
+  
+  if (!record || record.resetAt < now) {
+    rateLimitMap.set(identifier, {
+      count: 1,
+      resetAt: new Date(now.getTime() + windowMs),
+    });
+    return true;
+  }
+  
+  if (record.count >= limit) {
+    return false;
+  }
+  
+  record.count++;
+  return true;
+}
+
 export async function POST(request: NextRequest) {
   console.log('=== 登録API開始 ===');
   console.log('NODE_ENV:', process.env.NODE_ENV);
@@ -22,6 +48,14 @@ export async function POST(request: NextRequest) {
   console.log('EMAIL_PROVIDER:', process.env.EMAIL_PROVIDER);
   
   try {
+    // Content-Typeチェック
+    const contentType = request.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      return NextResponse.json(
+        { ok: false, error: 'Content-Type must be application/json' },
+        { status: 400 }
+      );
+    }
     // リクエストボディの取得（JSON解析エラーをキャッチ）
     let body;
     try {
@@ -29,7 +63,7 @@ export async function POST(request: NextRequest) {
     } catch (parseError) {
       console.error('リクエストボディのJSON解析エラー:', parseError);
       return NextResponse.json(
-        { error: '不正なリクエスト形式です' },
+        { ok: false, error: '不正なリクエスト形式です', code: 'INVALID_JSON' },
         { status: 400 }
       );
     }
@@ -41,6 +75,17 @@ export async function POST(request: NextRequest) {
       confirmPasswordLength: body.confirmPassword?.length,
       hasConfirmPassword: !!body.confirmPassword
     });
+    
+    // レート制限チェック（IPアドレスまたはメールアドレスで制限）
+    const clientIp = request.headers.get('x-forwarded-for') || 'unknown';
+    const rateLimitKey = body.email || clientIp;
+    
+    if (!checkRateLimit(rateLimitKey)) {
+      return NextResponse.json(
+        { ok: false, error: 'リクエストが多すぎます。しばらく待ってから再度お試しください。', code: 'RATE_LIMIT_EXCEEDED' },
+        { status: 429 }
+      );
+    }
     
     // バリデーション
     const validatedData = registerSchema.parse(body);
@@ -54,7 +99,7 @@ export async function POST(request: NextRequest) {
     } catch (dbError) {
       console.error('MongoDB接続エラー:', dbError);
       return NextResponse.json(
-        { error: 'データベース接続エラーが発生しました' },
+        { ok: false, error: 'データベース接続エラーが発生しました', code: 'DATABASE_CONNECTION_ERROR' },
         { status: 503 }
       );
     }
@@ -65,7 +110,7 @@ export async function POST(request: NextRequest) {
     if (existingUser) {
       console.log('既存ユーザーが見つかりました:', validatedData.email);
       return NextResponse.json(
-        { error: 'このメールアドレスは既に登録されています' },
+        { ok: false, error: 'このメールアドレスは既に登録されています', code: 'EMAIL_ALREADY_EXISTS' },
         { status: 409 }
       );
     }
@@ -79,13 +124,15 @@ export async function POST(request: NextRequest) {
       if (!passwordStrength.isStrong) {
         return NextResponse.json(
           { 
+            ok: false,
             error: 'パスワードが弱すぎます',
+            code: 'WEAK_PASSWORD',
             details: {
               feedback: passwordStrength.feedback,
               suggestions: passwordStrength.suggestions,
             }
           },
-          { status: 400 }
+          { status: 401 }
         );
       }
     }
@@ -155,12 +202,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
+        ok: true,
         message,
         user: {
           id: normalizedUser.id,
           email: normalizedUser.email,
-          name: normalizedUser.name,
-          emailVerified: normalizedUser.emailVerified,
         },
         emailSent,
       },
@@ -174,7 +220,9 @@ export async function POST(request: NextRequest) {
       console.log('バリデーションエラー詳細:', error.issues);
       return NextResponse.json(
         { 
+          ok: false,
           error: 'バリデーションエラー', 
+          code: 'VALIDATION_ERROR',
           details: error.issues.map((issue) => ({
             field: issue.path.join('.'),
             message: issue.message
@@ -192,7 +240,7 @@ export async function POST(request: NextRequest) {
       if (mongoError.code === 11000) {
         console.log('重複キーエラー:', mongoError);
         return NextResponse.json(
-          { error: 'このメールアドレスは既に登録されています' },
+          { ok: false, error: 'このメールアドレスは既に登録されています', code: 'EMAIL_ALREADY_EXISTS' },
           { status: 409 }
         );
       }
@@ -234,7 +282,9 @@ export async function POST(request: NextRequest) {
     if (process.env.NODE_ENV === 'development') {
       return NextResponse.json(
         { 
+          ok: false,
           error: errorMessage,
+          code: errorDetails.type || 'UNKNOWN_ERROR',
           details: errorDetails
         },
         { status: statusCode }
@@ -243,7 +293,7 @@ export async function POST(request: NextRequest) {
     
     // 本番環境では一般的なエラーメッセージを返す
     return NextResponse.json(
-      { error: 'ユーザー登録に失敗しました' },
+      { ok: false, error: 'ユーザー登録に失敗しました', code: 'REGISTRATION_FAILED' },
       { status: statusCode }
     );
   }
