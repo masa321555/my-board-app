@@ -10,6 +10,14 @@ export async function GET(_request: NextRequest) {
   try {
     const session = await getServerSession(authOptions) as any;
     
+    console.log('[Profile GET] Session:', {
+      hasSession: !!session,
+      hasUser: !!session?.user,
+      userId: (session?.user as any)?.id,
+      userEmail: session?.user?.email,
+      userName: session?.user?.name
+    });
+    
     if (!(session?.user as any)?.id) {
       return NextResponse.json(
         { error: '認証が必要です' },
@@ -19,17 +27,29 @@ export async function GET(_request: NextRequest) {
 
     await dbConnect();
     
+    console.log('[Profile GET] Searching for user with ID:', (session.user as any).id);
     const user = await User.findById((session.user as any).id).select('-password');
     
     if (!user) {
+      console.log('[Profile GET] User not found for ID:', (session.user as any).id);
       return NextResponse.json(
         { error: 'ユーザーが見つかりません' },
         { status: 404 }
       );
     }
 
+    console.log('[Profile GET] User found:', {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      bio: user.bio,
+      location: user.location,
+      website: user.website
+    });
+
     // データを正規化
     const normalizedUser = normalizeUser(user);
+    console.log('[Profile GET] Normalized user:', normalizedUser);
     
     return NextResponse.json(normalizedUser);
   } catch (error) {
@@ -46,6 +66,13 @@ export async function PUT(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions) as any;
     
+    console.log('[Profile PUT] Session:', {
+      hasSession: !!session,
+      hasUser: !!session?.user,
+      userId: (session?.user as any)?.id,
+      userEmail: session?.user?.email
+    });
+    
     if (!(session?.user as any)?.id) {
       return NextResponse.json(
         { error: '認証が必要です' },
@@ -55,6 +82,7 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
     const { name, bio, location, website } = body;
+    console.log('[Profile PUT] Request body:', { name, bio, location, website });
 
     // バリデーション
     if (!name || name.trim().length === 0) {
@@ -92,6 +120,7 @@ export async function PUT(request: NextRequest) {
 
     await dbConnect();
 
+    console.log('[Profile PUT] Updating user with ID:', (session.user as any).id);
     const updatedUser = await User.findByIdAndUpdate(
       (session.user as any).id,
       {
@@ -105,11 +134,20 @@ export async function PUT(request: NextRequest) {
     ).select('-password');
 
     if (!updatedUser) {
+      console.log('[Profile PUT] User not found for update');
       return NextResponse.json(
         { error: 'ユーザーが見つかりません' },
         { status: 404 }
       );
     }
+    
+    console.log('[Profile PUT] User updated:', {
+      id: updatedUser._id,
+      name: updatedUser.name,
+      bio: updatedUser.bio,
+      location: updatedUser.location,
+      website: updatedUser.website
+    });
 
     // データを正規化
     const normalizedUser = normalizeUser(updatedUser);

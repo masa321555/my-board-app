@@ -99,13 +99,24 @@ export function normalizePostsResponse(response: any): any {
 // ユーザーデータを正規化
 export function normalizeUser(user: any): any {
   if (!user) {
+    console.log('[normalizeUser] User is null/undefined');
     return null;
   }
+  
+  console.log('[normalizeUser] Input user:', {
+    _id: user._id,
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    bio: user.bio,
+    location: user.location,
+    website: user.website
+  });
   
   // MongoDBの_idをidに変換
   const id = user._id?.toString() || user.id || '';
   
-  return {
+  const normalized = {
     id,
     email: user.email || '',
     name: user.name || '',
@@ -118,4 +129,7 @@ export function normalizeUser(user: any): any {
     createdAt: user.createdAt?.toISOString ? user.createdAt.toISOString() : user.createdAt || new Date().toISOString(),
     updatedAt: user.updatedAt?.toISOString ? user.updatedAt.toISOString() : user.updatedAt || new Date().toISOString(),
   };
+  
+  console.log('[normalizeUser] Normalized user:', normalized);
+  return normalized;
 }

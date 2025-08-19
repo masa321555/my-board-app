@@ -68,9 +68,14 @@ export default function ProfilePage() {
     
     const fetchProfile = async () => {
       try {
+        console.log('[Profile Page] Fetching profile data...');
         const response = await fetch('/api/user/profile');
+        console.log('[Profile Page] Response status:', response.status);
+        
         if (response.ok) {
           const data = await response.json();
+          console.log('[Profile Page] Received data:', data);
+          
           const profileData = {
             name: data.name || '',
             email: data.email || '',
@@ -78,19 +83,35 @@ export default function ProfilePage() {
             location: data.location || '',
             website: data.website || '',
           };
+          console.log('[Profile Page] Setting profileData:', profileData);
+          
           setFormData(profileData);
           setOriginalData(profileData);
           setAvatarUrl(data.avatar || null);
         } else {
-          console.error('Profile fetch failed:', response.status);
+          const errorData = await response.json().catch(() => ({}));
+          console.error('[Profile Page] Profile fetch failed:', {
+            status: response.status,
+            error: errorData
+          });
         }
       } catch (error) {
-        console.error('Failed to fetch profile:', error);
+        console.error('[Profile Page] Failed to fetch profile:', error);
       }
     };
 
+    console.log('[Profile Page] Session state:', {
+      hasSession: !!session,
+      hasUser: !!session?.user,
+      userId: (session?.user as any)?.id,
+      userEmail: session?.user?.email,
+      userName: session?.user?.name
+    });
+    
     if ((session?.user as any)?.id) {
       fetchProfile();
+    } else {
+      console.log('[Profile Page] No user ID found in session, skipping profile fetch');
     }
   }, [session]);
 
@@ -109,6 +130,8 @@ export default function ProfilePage() {
     setIsSaving(true);
     setMessage(null);
 
+    console.log('[Profile Page] Saving profile with data:', formData);
+
     try {
       const response = await fetch('/api/user/profile', {
         method: 'PUT',
@@ -119,6 +142,10 @@ export default function ProfilePage() {
       });
 
       const data = await response.json();
+      console.log('[Profile Page] Save response:', {
+        status: response.status,
+        data: data
+      });
 
       if (!response.ok) {
         throw new Error(data.error || 'プロフィールの更新に失敗しました');
