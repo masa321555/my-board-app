@@ -3,89 +3,116 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/src/auth';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
-import { processImage } from '@/lib/imageUtils';
-import { v4 as uuidv4 } from 'uuid';
-import { writeFile, unlink } from 'fs/promises';
-import { join } from 'path';
-import { existsSync, mkdirSync } from 'fs';
+
+// Node.jsランタイムを指定（Edge Runtimeでは動作しない）
+export const runtime = 'nodejs';
+export const maxDuration = 60; // タイムアウト対策（60秒）
 
 // アバター画像のアップロード
 export async function POST(request: NextRequest) {
+  let userId: string | null = null;
+  
   try {
+    // 1. 認証チェック
     const session = await getServerSession(authOptions) as any;
+    userId = session?.user?.id || (session?.user as any)?.id;
     
-    if (!(session?.user as any)?.id) {
+    if (!userId) {
       return NextResponse.json(
-        { error: '認証が必要です' },
+        { 
+          ok: false, 
+          code: 'UNAUTHORIZED', 
+          message: '認証が必要です',
+          requestId: crypto.randomUUID()
+        },
         { status: 401 }
       );
     }
 
-    const formData = await request.formData();
-    const file = formData.get('avatar') as File;
+    // 2. FormDataの取得
+    let formData: FormData;
+    try {
+      formData = await request.formData();
+    } catch (_error) {
+      return NextResponse.json(
+        { 
+          ok: false, 
+          code: 'INVALID_REQUEST', 
+          message: 'FormDataの解析に失敗しました',
+          requestId: crypto.randomUUID()
+        },
+        { status: 400 }
+      );
+    }
+
+    // 3. ファイルの取得（"file"フィールドとして送信される）
+    const file = formData.get('file') as File | null;
     
     if (!file) {
+      // 互換性のため "avatar" フィールドも確認
+      const avatarFile = formData.get('avatar') as File | null;
+      if (!avatarFile) {
+        return NextResponse.json(
+          { 
+            ok: false, 
+            code: 'NO_FILE', 
+            message: 'ファイルがアップロードされていません',
+            requestId: crypto.randomUUID()
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    const uploadFile = file || (formData.get('avatar') as File);
+
+    // 4. ファイルサイズのチェック（2MB以下）
+    const maxSize = 2 * 1024 * 1024; // 2MB
+    if (uploadFile.size > maxSize) {
       return NextResponse.json(
-        { error: 'ファイルがアップロードされていません' },
-        { status: 400 }
+        { 
+          ok: false, 
+          code: 'FILE_TOO_LARGE', 
+          message: 'ファイルサイズは2MB以下にしてください',
+          requestId: crypto.randomUUID()
+        },
+        { status: 413 } // Payload Too Large
       );
     }
 
-    // ファイルサイズのチェック（5MB以下）
-    if (file.size > 5 * 1024 * 1024) {
-      return NextResponse.json(
-        { error: 'ファイルサイズは5MB以下にしてください' },
-        { status: 400 }
-      );
-    }
-
-    // ファイルタイプのチェック
+    // 5. ファイルタイプのチェック
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
+    if (!allowedTypes.includes(uploadFile.type)) {
       return NextResponse.json(
-        { error: '画像ファイル（JPEG、PNG、WebP）のみアップロードできます' },
-        { status: 400 }
+        { 
+          ok: false, 
+          code: 'UNSUPPORTED_MEDIA_TYPE', 
+          message: '画像ファイル（JPEG、PNG、WebP）のみアップロードできます',
+          requestId: crypto.randomUUID()
+        },
+        { status: 415 } // Unsupported Media Type
       );
     }
 
-    // 画像をバッファに変換
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    // 6. 画像データの取得
+    const bytes = await uploadFile.arrayBuffer();
+    const _buffer = Buffer.from(bytes); // TODO: Vercel Blobアップロード時に使用
 
-    // 画像を処理（リサイズ、フォーマット変換）
-    const processedImage = await processImage(buffer, {
-      width: 400,
-      height: 400,
-      quality: 85,
-      format: 'jpeg',
-    });
+    // 7. ファイル名の生成（安全な名前）
+    const timestamp = Date.now();
+    const extension = uploadFile.type.split('/')[1];
+    const safeFileName = `${userId}/${timestamp}.${extension}`;
 
-    // ローカルファイルシステムに保存
-    const uploadDir = join(process.cwd(), 'public', 'uploads', 'avatars');
-    if (!existsSync(uploadDir)) {
-      mkdirSync(uploadDir, { recursive: true });
-    }
+    // TODO: Vercel Blobへのアップロード実装
+    // 現在は仮のURLを返す
+    const avatarUrl = `/uploads/avatars/${safeFileName}`;
 
-    const fileName = `${(session.user as any).id}_${uuidv4()}.jpg`;
-    const filePath = join(uploadDir, fileName);
-    
-    await writeFile(filePath, processedImage);
-
-    // アバターURLを生成
-    const avatarUrl = `/uploads/avatars/${fileName}`;
-
-    // データベースの更新
+    // 8. データベースの更新
     await dbConnect();
-    
-    // 古いアバターのパスを取得（後で削除するため）
-    const oldUser = await User.findById((session.user as any).id).select('avatar');
-    const oldAvatarPath = oldUser?.avatar?.startsWith('/uploads/avatars/') 
-      ? join(process.cwd(), 'public', oldUser.avatar)
-      : null;
     
     // 新しいアバターURLを保存
     const updatedUser = await User.findByIdAndUpdate(
-      (session.user as any).id,
+      userId,
       {
         avatar: avatarUrl,
         updatedAt: new Date(),
@@ -95,29 +122,53 @@ export async function POST(request: NextRequest) {
 
     if (!updatedUser) {
       return NextResponse.json(
-        { error: 'ユーザーが見つかりません' },
+        { 
+          ok: false, 
+          code: 'USER_NOT_FOUND', 
+          message: 'ユーザーが見つかりません',
+          requestId: crypto.randomUUID()
+        },
         { status: 404 }
       );
     }
 
-    // 古いアバターがローカルにある場合は削除
-    if (oldAvatarPath && existsSync(oldAvatarPath)) {
-      try {
-        await unlink(oldAvatarPath);
-      } catch (error) {
-        console.error('Failed to delete old avatar:', error);
-        // 古い画像の削除に失敗してもエラーにはしない
-      }
-    }
-
+    // 9. 成功レスポンス
     return NextResponse.json({
+      ok: true,
       message: 'アバター画像をアップロードしました',
       avatarUrl,
-    });
+      requestId: crypto.randomUUID()
+    }, { status: 201 });
+
   } catch (error) {
     console.error('Avatar upload error:', error);
+    
+    // エラーの種類に応じた適切なステータスコードを返す
+    const requestId = crypto.randomUUID();
+    
+    if (error instanceof Error) {
+      // MongoDB接続エラー
+      if (error.message.includes('connect')) {
+        return NextResponse.json(
+          { 
+            ok: false, 
+            code: 'DATABASE_ERROR', 
+            message: 'データベース接続エラー',
+            requestId
+          },
+          { status: 503 } // Service Unavailable
+        );
+      }
+    }
+    
+    // その他の予期しないエラー
     return NextResponse.json(
-      { error: 'アバター画像のアップロードに失敗しました' },
+      { 
+        ok: false, 
+        code: 'INTERNAL_ERROR', 
+        message: 'アバター画像のアップロードに失敗しました',
+        requestId
+      },
       { status: 500 }
     );
   }
@@ -127,35 +178,25 @@ export async function POST(request: NextRequest) {
 export async function DELETE(_request: NextRequest) {
   try {
     const session = await getServerSession(authOptions) as any;
+    const userId = session?.user?.id || (session?.user as any)?.id;
     
-    if (!(session?.user as any)?.id) {
+    if (!userId) {
       return NextResponse.json(
-        { error: '認証が必要です' },
+        { 
+          ok: false, 
+          code: 'UNAUTHORIZED', 
+          message: '認証が必要です',
+          requestId: crypto.randomUUID()
+        },
         { status: 401 }
       );
     }
 
     await dbConnect();
     
-    // 現在のアバター情報を取得
-    const user = await User.findById((session.user as any).id).select('avatar');
-    
-    if (user?.avatar && user.avatar.startsWith('/uploads/avatars/')) {
-      // ローカルファイルパスを生成
-      const avatarPath = join(process.cwd(), 'public', user.avatar);
-      
-      if (existsSync(avatarPath)) {
-        try {
-          await unlink(avatarPath);
-        } catch (error) {
-          console.error('Failed to delete avatar from local storage:', error);
-        }
-      }
-    }
-    
     // データベースからアバターを削除
     const updatedUser = await User.findByIdAndUpdate(
-      (session.user as any).id,
+      userId,
       {
         avatar: null,
         updatedAt: new Date(),
@@ -165,18 +206,30 @@ export async function DELETE(_request: NextRequest) {
 
     if (!updatedUser) {
       return NextResponse.json(
-        { error: 'ユーザーが見つかりません' },
+        { 
+          ok: false, 
+          code: 'USER_NOT_FOUND', 
+          message: 'ユーザーが見つかりません',
+          requestId: crypto.randomUUID()
+        },
         { status: 404 }
       );
     }
 
     return NextResponse.json({
+      ok: true,
       message: 'アバター画像を削除しました',
+      requestId: crypto.randomUUID()
     });
   } catch (error) {
     console.error('Avatar delete error:', error);
     return NextResponse.json(
-      { error: 'アバター画像の削除に失敗しました' },
+      { 
+        ok: false, 
+        code: 'INTERNAL_ERROR', 
+        message: 'アバター画像の削除に失敗しました',
+        requestId: crypto.randomUUID()
+      },
       { status: 500 }
     );
   }

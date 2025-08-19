@@ -215,10 +215,10 @@ export default function ProfilePage() {
     console.log('Selected file:', file.name, file.size, file.type);
 
     // ファイルサイズチェック（クライアント側）
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > 2 * 1024 * 1024) {
       setMessage({
         type: 'error',
-        text: 'ファイルサイズは5MB以下にしてください',
+        text: 'ファイルサイズは2MB以下にしてください',
       });
       return;
     }
@@ -238,7 +238,7 @@ export default function ProfilePage() {
     setUploadProgress(0);
 
     const formData = new FormData();
-    formData.append('avatar', file);
+    formData.append('file', file);
 
     try {
       console.log('Uploading file to /api/user/avatar');
@@ -282,12 +282,24 @@ export default function ProfilePage() {
       const result = await uploadPromise;
 
       if (!result.ok) {
-        throw new Error(result.data.error || 'アバターのアップロードに失敗しました');
+        // 新しいエラーレスポンス形式に対応
+        const errorMessage = result.data.message || result.data.error || 'アバターのアップロードに失敗しました';
+        const errorCode = result.data.code;
+        
+        // エラーコードに応じた詳細なメッセージ
+        let detailedMessage = errorMessage;
+        if (errorCode === 'FILE_TOO_LARGE') {
+          detailedMessage += ' (最大2MBまで)';
+        } else if (errorCode === 'UNSUPPORTED_MEDIA_TYPE') {
+          detailedMessage += ' (JPEG、PNG、WebPのみ対応)';
+        }
+        
+        throw new Error(detailedMessage);
       }
 
       console.log('Upload successful:', result.data);
       setAvatarUrl(result.data.avatarUrl);
-      setMessage({ type: 'success', text: 'アバター画像をアップロードしました' });
+      setMessage({ type: 'success', text: result.data.message || 'アバター画像をアップロードしました' });
     } catch (error) {
       console.error('Upload failed:', error);
       setMessage({
