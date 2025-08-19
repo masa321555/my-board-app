@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import {
@@ -19,7 +19,7 @@ import {
   DialogContent,
   DialogActions,
   DialogContentText,
-  LinearProgress,
+  // LinearProgress, // アバターアップロード機能は一時的に無効化
 } from '@mui/material';
 import {
   Person as PersonIcon,
@@ -28,7 +28,7 @@ import {
   Save as SaveIcon,
   Cancel as CancelIcon,
   Delete as DeleteIcon,
-  PhotoCamera as PhotoCameraIcon,
+  // PhotoCamera as PhotoCameraIcon, // アバターアップロード機能は一時的に無効化
 } from '@mui/icons-material';
 import ProtectedLayout from '@/components/ProtectedLayout';
 
@@ -40,9 +40,10 @@ export default function ProfilePage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // アバターアップロード機能は一時的に無効化
+  // const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  // const [uploadProgress, setUploadProgress] = useState(0);
+  // const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   
   const [formData, setFormData] = useState({
@@ -199,11 +200,14 @@ export default function ProfilePage() {
       .slice(0, 2);
   };
 
-  const handleAvatarClick = () => {
-    console.log('Avatar clicked, fileInputRef:', fileInputRef.current);
-    fileInputRef.current?.click();
-  };
+  // アバターアップロード機能は一時的に無効化
+  // const handleAvatarClick = () => {
+  //   console.log('Avatar clicked, fileInputRef:', fileInputRef.current);
+  //   fileInputRef.current?.click();
+  // };
 
+  // アバターアップロード機能は一時的に無効化
+  /*
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log('File input changed:', event.target.files);
     const file = event.target.files?.[0];
@@ -315,7 +319,10 @@ export default function ProfilePage() {
       }
     }
   };
+  */
 
+  // アバター削除機能も一時的に無効化
+  /*
   const handleDeleteAvatar = async () => {
     setIsUploadingAvatar(true);
     setMessage(null);
@@ -342,6 +349,7 @@ export default function ProfilePage() {
       setIsUploadingAvatar(false);
     }
   };
+  */
 
   // ローディング中の表示
   if (isLoading || status === 'loading') {
@@ -373,7 +381,7 @@ export default function ProfilePage() {
             </Alert>
           )}
 
-          {/* アップロード進捗バー */}
+          {/* アップロード進捗バー - アバターアップロード機能は一時的に無効化
           {isUploadingAvatar && (
             <Box sx={{ mb: 3 }}>
               <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -381,7 +389,7 @@ export default function ProfilePage() {
               </Typography>
               <LinearProgress variant="determinate" value={uploadProgress} />
             </Box>
-          )}
+          )} */}
 
           <Box 
             sx={{ 
@@ -404,13 +412,12 @@ export default function ProfilePage() {
                     fontSize: 48,
                     bgcolor: 'primary.main',
                     mb: 2,
-                    cursor: 'pointer',
                   }}
-                  onClick={handleAvatarClick}
                 >
                   {!avatarUrl && (formData.name || session?.user?.name ? getInitials(formData.name || session?.user?.name || '') : <PersonIcon />)}
                 </Avatar>
                 
+                {/* アバターアップロード機能は外部ストレージ実装まで一時的に無効化
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -440,7 +447,7 @@ export default function ProfilePage() {
                       削除
                     </Button>
                   )}
-                </Box>
+                </Box> */}
 
                 <Typography variant="h6" sx={{ mt: 2 }}>
                   {formData.name || session?.user?.name}
