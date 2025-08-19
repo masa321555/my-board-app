@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/src/auth';
-import dbConnect from '@/lib/db';
+import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import { normalizeUser } from '@/utils/dataTransform';
 

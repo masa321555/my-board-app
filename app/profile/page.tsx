@@ -45,8 +45,17 @@ export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
-    name: session?.user?.name || '',
-    email: session?.user?.email || '',
+    name: '',
+    email: '',
+    bio: '',
+    location: '',
+    website: '',
+  });
+  
+  // APIから取得したオリジナルのデータを保持
+  const [originalData, setOriginalData] = useState({
+    name: '',
+    email: '',
     bio: '',
     location: '',
     website: '',
@@ -62,14 +71,18 @@ export default function ProfilePage() {
         const response = await fetch('/api/user/profile');
         if (response.ok) {
           const data = await response.json();
-          setFormData({
+          const profileData = {
             name: data.name || '',
             email: data.email || '',
             bio: data.bio || '',
             location: data.location || '',
             website: data.website || '',
-          });
+          };
+          setFormData(profileData);
+          setOriginalData(profileData);
           setAvatarUrl(data.avatar || null);
+        } else {
+          console.error('Profile fetch failed:', response.status);
         }
       } catch (error) {
         console.error('Failed to fetch profile:', error);
@@ -88,13 +101,7 @@ export default function ProfilePage() {
 
   const handleCancel = () => {
     setIsEditing(false);
-    setFormData({
-      name: session?.user?.name || '',
-      email: session?.user?.email || '',
-      bio: '',
-      location: '',
-      website: '',
-    });
+    setFormData(originalData);
     setMessage(null);
   };
 
@@ -126,6 +133,8 @@ export default function ProfilePage() {
         },
       });
 
+      // 保存成功時にoriginalDataも更新
+      setOriginalData(formData);
       setMessage({ type: 'success', text: 'プロフィールを更新しました' });
       setIsEditing(false);
     } catch (error) {

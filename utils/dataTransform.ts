@@ -95,3 +95,27 @@ export function normalizePostsResponse(response: any): any {
     pagination: normalizePagination(response?.pagination || {})
   };
 }
+
+// ユーザーデータを正規化
+export function normalizeUser(user: any): any {
+  if (!user) {
+    return null;
+  }
+  
+  // MongoDBの_idをidに変換
+  const id = user._id?.toString() || user.id || '';
+  
+  return {
+    id,
+    email: user.email || '',
+    name: user.name || '',
+    emailVerified: user.emailVerified || false,
+    bio: user.bio || '',
+    location: user.location || '',
+    website: user.website || '',
+    avatar: user.avatar || null,
+    role: user.role || 'user',
+    createdAt: user.createdAt?.toISOString ? user.createdAt.toISOString() : user.createdAt || new Date().toISOString(),
+    updatedAt: user.updatedAt?.toISOString ? user.updatedAt.toISOString() : user.updatedAt || new Date().toISOString(),
+  };
+}
