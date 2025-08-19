@@ -168,8 +168,10 @@ export default function ProfilePage() {
       setMessage({ type: 'success', text: 'プロフィールを更新しました' });
       setIsEditing(false);
       
-      // ページをリフレッシュして、ヘッダーの名前表示を更新
-      router.refresh();
+      // セッション更新が完了するまで少し待機してからページをリロード
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     } catch (error) {
       setMessage({ 
         type: 'error', 
