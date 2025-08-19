@@ -3,22 +3,13 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/src/auth';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
-import { normalizeUser } from '@/utils/dataTransform';
 
 // プロフィール取得
 export async function GET(_request: NextRequest) {
   try {
     const session = await getServerSession(authOptions) as any;
     
-    console.log('[Profile GET] Session:', {
-      hasSession: !!session,
-      hasUser: !!session?.user,
-      userId: (session?.user as any)?.id,
-      userEmail: session?.user?.email,
-      userName: session?.user?.name
-    });
-    
-    if (!(session?.user as any)?.id) {
+    if (!session?.user?.id && !(session?.user as any)?.id) {
       return NextResponse.json(
         { error: '認証が必要です' },
         { status: 401 }
@@ -27,31 +18,34 @@ export async function GET(_request: NextRequest) {
 
     await dbConnect();
     
-    console.log('[Profile GET] Searching for user with ID:', (session.user as any).id);
-    const user = await User.findById((session.user as any).id).select('-password');
+    // セッションのユーザーIDを確実に取得
+    const userId = session.user.id || (session.user as any).id;
+    
+    const user = await User.findById(userId).select('-password').lean();
     
     if (!user) {
-      console.log('[Profile GET] User not found for ID:', (session.user as any).id);
       return NextResponse.json(
         { error: 'ユーザーが見つかりません' },
         { status: 404 }
       );
     }
 
-    console.log('[Profile GET] User found:', {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      bio: user.bio,
-      location: user.location,
-      website: user.website
-    });
-
-    // データを正規化
-    const normalizedUser = normalizeUser(user);
-    console.log('[Profile GET] Normalized user:', normalizedUser);
+    // 直接レスポンスを構築（normalizeUserを使わない）
+    const response = {
+      id: user._id.toString(),
+      email: user.email || '',
+      name: user.name || '',
+      emailVerified: user.emailVerified || false,
+      bio: user.bio || '',
+      location: user.location || '',
+      website: user.website || '',
+      avatar: user.avatar || null,
+      role: user.role || 'user',
+      createdAt: user.createdAt || new Date(),
+      updatedAt: user.updatedAt || new Date(),
+    };
     
-    return NextResponse.json(normalizedUser);
+    return NextResponse.json(response);
   } catch (error) {
     console.error('Profile fetch error:', error);
     return NextResponse.json(
@@ -66,14 +60,7 @@ export async function PUT(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions) as any;
     
-    console.log('[Profile PUT] Session:', {
-      hasSession: !!session,
-      hasUser: !!session?.user,
-      userId: (session?.user as any)?.id,
-      userEmail: session?.user?.email
-    });
-    
-    if (!(session?.user as any)?.id) {
+    if (!session?.user?.id && !(session?.user as any)?.id) {
       return NextResponse.json(
         { error: '認証が必要です' },
         { status: 401 }
@@ -82,7 +69,6 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
     const { name, bio, location, website } = body;
-    console.log('[Profile PUT] Request body:', { name, bio, location, website });
 
     // バリデーション
     if (!name || name.trim().length === 0) {
@@ -120,9 +106,11 @@ export async function PUT(request: NextRequest) {
 
     await dbConnect();
 
-    console.log('[Profile PUT] Updating user with ID:', (session.user as any).id);
+    // セッションのユーザーIDを確実に取得
+    const userId = session.user.id || (session.user as any).id;
+    
     const updatedUser = await User.findByIdAndUpdate(
-      (session.user as any).id,
+      userId,
       {
         name: name.trim(),
         bio: bio?.trim() || '',
@@ -131,30 +119,33 @@ export async function PUT(request: NextRequest) {
         updatedAt: new Date(),
       },
       { new: true, runValidators: true }
-    ).select('-password');
+    ).select('-password').lean();
 
     if (!updatedUser) {
-      console.log('[Profile PUT] User not found for update');
       return NextResponse.json(
         { error: 'ユーザーが見つかりません' },
         { status: 404 }
       );
     }
-    
-    console.log('[Profile PUT] User updated:', {
-      id: updatedUser._id,
-      name: updatedUser.name,
-      bio: updatedUser.bio,
-      location: updatedUser.location,
-      website: updatedUser.website
-    });
 
-    // データを正規化
-    const normalizedUser = normalizeUser(updatedUser);
+    // 直接レスポンスを構築
+    const userResponse = {
+      id: updatedUser._id.toString(),
+      email: updatedUser.email || '',
+      name: updatedUser.name || '',
+      emailVerified: updatedUser.emailVerified || false,
+      bio: updatedUser.bio || '',
+      location: updatedUser.location || '',
+      website: updatedUser.website || '',
+      avatar: updatedUser.avatar || null,
+      role: updatedUser.role || 'user',
+      createdAt: updatedUser.createdAt || new Date(),
+      updatedAt: updatedUser.updatedAt || new Date(),
+    };
     
     return NextResponse.json({
       message: 'プロフィールを更新しました',
-      user: normalizedUser,
+      user: userResponse,
     });
   } catch (error) {
     console.error('Profile update error:', error);
