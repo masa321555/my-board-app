@@ -4,32 +4,29 @@ import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
 let transporter: Transporter | null = null;
 
-// ダミートランスポーターの作成
+// メール設定エラーのクラス
+export class EmailConfigurationError extends Error {
+  constructor(message: string, public context: string) {
+    super(message);
+    this.name = 'EmailConfigurationError';
+  }
+}
+
+// ダミートランスポーターの作成（エラーを投げるバージョン）
 function createDummyTransporter(context: string): Transporter {
   const dummyTransporter = Object.create(nodemailer.createTransport.prototype);
   
   dummyTransporter.sendMail = async (mailOptions: SMTPTransport.MailOptions): Promise<SMTPTransport.SentMessageInfo> => {
-    console.log(`[${context}] Email would be sent:`, {
+    console.error(`[${context}] Email configuration missing. Cannot send email:`, {
       to: mailOptions.to,
       subject: mailOptions.subject
     });
     
-    // Convert all addresses to strings
-    const toAddresses = Array.isArray(mailOptions.to) 
-      ? mailOptions.to.map(addr => addr?.toString() || '')
-      : [mailOptions.to?.toString() || ''];
-    
-    return {
-      messageId: `dummy-${context}-${Date.now()}@local`,
-      envelope: {
-        from: mailOptions.from?.toString() || 'noreply@local',
-        to: toAddresses
-      },
-      accepted: toAddresses,
-      rejected: [],
-      pending: [],
-      response: '250 OK: Dummy message sent'
-    };
+    // 環境変数が設定されていない場合はエラーを投げる
+    throw new EmailConfigurationError(
+      `Email sending failed: ${context}. Please configure email settings in environment variables.`,
+      context
+    );
   };
   
   dummyTransporter.verify = async (): Promise<true> => {
@@ -68,13 +65,35 @@ export async function getEmailClient(): Promise<Transporter> {
   emailProvider = emailProvider || 'smtp';
   
   // メール設定が全く存在しない場合、ダミートランスポーターを返す
-  if (!process.env.MAIL_HOST && !process.env.GMAIL_USER && !process.env.YAHOO_USER) {
-    console.warn('No email configuration found. Email sending will be disabled.');
+  if (!process.env.MAIL_HOST && !process.env.GMAIL_USER && !process.env.YAHOO_USER && !process.env.SENDGRID_API_KEY) {
+    console.error('No email configuration found. Email sending will fail.');
     transporter = createDummyTransporter('no-config');
     return transporter;
   }
   
   switch (emailProvider.toLowerCase()) {
+    case 'sendgrid':
+      const sendgridApiKey = process.env.SENDGRID_API_KEY;
+      
+      if (!sendgridApiKey) {
+        console.error('SendGrid API key not configured. Please set SENDGRID_API_KEY environment variable.');
+        transporter = createDummyTransporter('sendgrid-not-configured');
+        return transporter;
+      }
+      
+      // SendGrid用のnodemailerトランスポーター設定
+      transporter = nodemailer.createTransport({
+        host: 'smtp.sendgrid.net',
+        port: 587,
+        secure: false,
+        auth: {
+          user: 'apikey', // SendGridでは常に'apikey'を使用
+          pass: sendgridApiKey,
+        },
+      });
+      
+      console.log('SendGrid transporter created');
+      break;
     case 'ethereal':
       // Ethereal Email for development testing
       console.log('Using Ethereal Email for testing');
@@ -222,7 +241,8 @@ export async function getEmailClient(): Promise<Transporter> {
 export async function closeEmailClient(): Promise<void> {
   if (transporter) {
     try {
-      await transporter.close();
+      // close()メソッドは同期的
+      transporter.close();
     } catch (error) {
       console.error('Error closing email transporter:', error);
     }

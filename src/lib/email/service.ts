@@ -1,6 +1,6 @@
 import { render } from '@react-email/render';
 import nodemailer from 'nodemailer';
-import { getEmailClient } from './client';
+import { getEmailClient, EmailConfigurationError } from './client';
 import { EmailOptions, EmailResponse, EmailTemplate } from '@/types/email';
 import WelcomeEmail from '@/emails/templates/WelcomeEmail';
 import VerificationEmail from '@/emails/templates/VerificationEmail';
@@ -46,6 +46,62 @@ export class EmailService {
 
   // テンプレートをHTMLに変換
   private async renderTemplate(template: EmailTemplate, data: any): Promise<string> {
+    // 環境変数でプレーンテキストモードを有効化
+    const usePlainText = process.env.EMAIL_USE_PLAIN_TEXT === 'true';
+    
+    if (usePlainText) {
+      // プレーンテキストメールの生成
+      switch (template) {
+        case 'verification':
+          return `
+メールアドレスの確認をお願いします
+
+${data.name}様
+
+会員制掲示板へのご登録ありがとうございます。
+以下のリンクをクリックして、メールアドレスの確認を完了してください。
+
+${data.verificationUrl}
+
+このリンクは24時間有効です。
+
+よろしくお願いいたします。
+会員制掲示板
+          `.trim();
+        case 'welcome':
+          return `
+ようこそ！
+
+${data.name}様
+
+会員制掲示板へのご登録が完了しました。
+今後ともよろしくお願いいたします。
+
+会員制掲示板
+          `.trim();
+        case 'password-reset':
+          return `
+パスワードリセット
+
+${data.name}様
+
+パスワードリセットのリクエストを受け付けました。
+以下のリンクをクリックして、新しいパスワードを設定してください。
+
+${data.resetUrl}
+
+このリンクは1時間有効です。
+
+心当たりがない場合は、このメールを無視してください。
+
+会員制掲示板
+          `.trim();
+        default:
+          throw new Error(`Unknown email template: ${template}`);
+      }
+    }
+    
+    // HTMLメールの生成（既存のコード）
     switch (template) {
       case 'welcome':
         return render(WelcomeEmail(data));
@@ -77,8 +133,9 @@ export class EmailService {
           };
         }
 
-        // HTMLコンテンツを生成
-        const html = await this.renderTemplate(options.template, options.data);
+        // コンテンツを生成
+        const content = await this.renderTemplate(options.template, options.data);
+        const isPlainText = process.env.EMAIL_USE_PLAIN_TEXT === 'true';
 
         // メールクライアントを取得
         const transporter = await getEmailClient();
@@ -91,16 +148,26 @@ export class EmailService {
           to: options.to,
           subject: options.subject,
           templateUsed: options.template,
+          isPlainText,
           attempt,
         });
         
-        const result = await transporter.sendMail({
+        // メールオプションを構築
+        const mailOptions: any = {
           from: fromAddress,
           to: options.to,
           subject: options.subject,
-          html,
           attachments: options.attachments,
-        });
+        };
+        
+        // プレーンテキストまたはHTMLを設定
+        if (isPlainText) {
+          mailOptions.text = content;
+        } else {
+          mailOptions.html = content;
+        }
+        
+        const result = await transporter.sendMail(mailOptions);
 
         console.log('Email sent successfully:', {
           messageId: result.messageId,
@@ -123,13 +190,46 @@ export class EmailService {
           messageId: result.messageId,
         };
       } catch (error) {
-        console.error(`[Email Attempt ${attempt}/${maxRetries}] Email send error:`, error);
+        // エラーの詳細をログに記録
+        const errorDetails = {
+          attempt,
+          maxRetries,
+          errorType: error?.constructor?.name,
+          errorCode: (error as any)?.code,
+          errorMessage: error instanceof Error ? error.message : String(error),
+          smtpResponse: (error as any)?.response,
+          smtpCommand: (error as any)?.command,
+        };
+        
+        console.error(`[Email Attempt ${attempt}/${maxRetries}] Email send error:`, errorDetails);
+        
+        // 設定エラーの場合は即座に失敗
+        if (error instanceof EmailConfigurationError) {
+          return {
+            success: false,
+            error: error.message,
+            code: 'EMAIL_CONFIG_ERROR',
+          };
+        }
         
         // 最後の試行の場合、またはリトライ不可能なエラーの場合
         if (attempt === maxRetries || this.isNonRetryableError(error)) {
+          // エラーコードを判定
+          let errorCode = 'EMAIL_SEND_FAILED';
+          if ((error as any)?.code === 'ENOTFOUND') {
+            errorCode = 'EMAIL_HOST_NOT_FOUND';
+          } else if ((error as any)?.code === 'EAUTH') {
+            errorCode = 'EMAIL_AUTH_FAILED';
+          } else if ((error as any)?.code === 'EENVELOPE') {
+            errorCode = 'EMAIL_INVALID_RECIPIENT';
+          } else if ((error as any)?.response?.includes('550')) {
+            errorCode = 'EMAIL_RECIPIENT_REJECTED';
+          }
+          
           return {
             success: false,
             error: error instanceof Error ? error.message : 'Failed to send email',
+            code: errorCode,
           };
         }
         
@@ -148,14 +248,28 @@ export class EmailService {
 
   // リトライ不可能なエラーかどうかを判定
   private isNonRetryableError(error: unknown): boolean {
+    // 設定エラーはリトライ不可能
+    if (error instanceof EmailConfigurationError) {
+      return true;
+    }
+    
     if (error instanceof Error) {
       const message = error.message.toLowerCase();
       // 認証エラー、無効なアドレスなどはリトライしない
       return message.includes('auth') || 
              message.includes('invalid') || 
              message.includes('credentials') ||
-             message.includes('authentication');
+             message.includes('authentication') ||
+             message.includes('configuration');
     }
+    
+    // SMTPエラーコードをチェック
+    const errorCode = (error as any)?.code;
+    if (errorCode) {
+      // 認証エラー、ホストが見つからない、メールアドレスエラーなど
+      return ['EAUTH', 'ENOTFOUND', 'EENVELOPE', 'ECONNREFUSED'].includes(errorCode);
+    }
+    
     return false;
   }
 

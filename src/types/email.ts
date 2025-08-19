@@ -23,6 +23,7 @@ export interface EmailResponse {
   success: boolean;
   messageId?: string;
   error?: string;
+  code?: string;
 }
 
 export interface EmailRateLimit {

@@ -248,6 +248,8 @@ export async function POST(request: NextRequest) {
 
     // 確認メールを送信
     let emailSent = false;
+    let emailError: { error?: string; code?: string } = {};
+    
     try {
       // APP_URLが未設定の場合のフォールバック
       const appUrl = process.env.APP_URL || 
@@ -265,14 +267,23 @@ export async function POST(request: NextRequest) {
       if (emailSent) {
         console.log('メール送信成功');
       } else {
-        console.error('メール送信失敗:', emailResult.error);
+        emailError = {
+          error: emailResult.error,
+          code: emailResult.code,
+        };
+        console.error('メール送信失敗:', emailError);
+        
         // 開発環境では確認URLをコンソールに出力
         if (isDevelopment) {
           console.log('開発環境: 確認URL:', verificationUrl);
         }
       }
-    } catch (emailError) {
-      console.error('確認メール送信エラー:', emailError);
+    } catch (error) {
+      emailError = {
+        error: error instanceof Error ? error.message : 'メール送信中にエラーが発生しました',
+        code: 'EMAIL_SEND_EXCEPTION',
+      };
+      console.error('確認メール送信エラー:', error);
       emailSent = false;
     }
 
@@ -304,14 +315,29 @@ export async function POST(request: NextRequest) {
         { emailSent: true }
       );
     } else {
-      // メール送信失敗: 202 Accepted
+      // メール設定エラーの場合は500を返す
+      if (emailError.code === 'EMAIL_CONFIG_ERROR') {
+        return errorResponse(
+          'メール送信の設定に問題があります。管理者にお問い合わせください。',
+          'EMAIL_SERVICE_UNAVAILABLE',
+          500,
+          {
+            requiresEmailVerification: true,
+            emailSent: false,
+            emailError: emailError.code
+          }
+        );
+      }
+      
+      // その他のメール送信失敗: 202 Accepted
       return successResponse(
         { user: userData },
         message,
         202,
         { 
           requiresEmailVerification: true,
-          emailSent: false 
+          emailSent: false,
+          emailError: emailError.code
         }
       );
     }
