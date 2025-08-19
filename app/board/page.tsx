@@ -137,7 +137,7 @@ export default function BoardPage() {
 
       const data = await response.json();
       
-      // スキーマ検証
+      // スキーマ検証（詳細なエラーログ付き）
       const validatedData = postsResponseSchema.safeParse(data);
       
       if (validatedData.success) {
@@ -146,16 +146,30 @@ export default function BoardPage() {
           setPagination(validatedData.data.pagination);
         });
       } else {
-        console.error('レスポンススキーマ検証エラー:', validatedData.error);
-        // フォールバック
+        // 詳細なエラーログ
+        console.error('[Board Page] レスポンススキーマ検証エラー:', {
+          errors: validatedData.error.issues.map(issue => ({
+            path: issue.path.join('.'),
+            message: issue.message,
+            code: issue.code,
+            expected: (issue as any).expected,
+            received: (issue as any).received,
+          })),
+          rawResponse: JSON.stringify(data, null, 2).substring(0, 500) + '...',
+        });
+        
+        // より賢いフォールバック処理
+        const fallbackPosts = Array.isArray(data?.posts) ? data.posts : [];
+        const fallbackPagination = data?.pagination || {
+          page: currentPageRef.current,
+          limit: currentLimitRef.current,
+          total: 0,
+          totalPages: 0
+        };
+        
         safeSetState(() => {
-          setPosts([]);
-          setPagination({
-            page: 1,
-            limit: 10,
-            total: 0,
-            totalPages: 0
-          });
+          setPosts(fallbackPosts);
+          setPagination(fallbackPagination);
         });
       }
     } catch (error: any) {
@@ -384,16 +398,22 @@ export default function BoardPage() {
             <Card key={`post-${post.id}-${dynamicKey}`} sx={{ mb: 2 }}>
               <CardContent>
                 <Typography variant="h6" component="h2" gutterBottom>
-                  {post.title}
+                  {post?.title || '無題'}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                  投稿者: {post.authorName} | 
-                  {format(new Date(post.createdAt), 'yyyy年MM月dd日 HH:mm', { locale: ja })}
+                  投稿者: {post?.authorName || 'Unknown'} | 
+                  {post?.createdAt 
+                    ? format(new Date(post.createdAt), 'yyyy年MM月dd日 HH:mm', { locale: ja })
+                    : '日付不明'
+                  }
                 </Typography>
                 <Typography variant="body1" sx={{ mt: 2, whiteSpace: 'pre-wrap' }}>
-                  {post.content.length > 200 
-                    ? `${post.content.substring(0, 200)}...` 
-                    : post.content
+                  {post?.content 
+                    ? (post.content.length > 200 
+                        ? `${post.content.substring(0, 200)}...` 
+                        : post.content
+                      )
+                    : '内容なし'
                   }
                 </Typography>
               </CardContent>
@@ -405,7 +425,12 @@ export default function BoardPage() {
                 >
                   詳細を見る
                 </Button>
-                {(session?.user as any)?.id === (typeof post.author === 'object' ? post.author.id : post.author) && (
+                {(session?.user as any)?.id && post?.author && 
+                  (session?.user as any).id === (
+                    typeof post.author === 'object' && post.author !== null
+                      ? (post.author as any).id 
+                      : post.author
+                  ) && (
                   <Box>
                     <IconButton
                       size="small"
