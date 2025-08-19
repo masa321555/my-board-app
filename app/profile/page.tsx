@@ -171,7 +171,7 @@ export default function ProfilePage() {
       // セッション更新が完了するまで少し待機してからページをリロード
       setTimeout(() => {
         window.location.reload();
-      }, 500);
+      }, 1000);
     } catch (error) {
       setMessage({ 
         type: 'error', 

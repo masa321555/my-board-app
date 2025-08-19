@@ -63,12 +63,19 @@ export const authOptions: any = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }: any) {
+    async jwt({ token, user, trigger, session }: any) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
         token.emailVerified = !!user.emailVerified;
+        token.name = user.name;
       }
+      
+      // update()が呼ばれた場合、セッションの更新内容をトークンに反映
+      if (trigger === "update" && session?.user) {
+        token.name = session.user.name;
+      }
+      
       return token;
     },
     async session({ session, token }: any) {
@@ -76,6 +83,7 @@ export const authOptions: any = {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
         session.user.emailVerified = (token.emailVerified as boolean) ?? true;
+        session.user.name = token.name as string;
       }
       return session;
     },
