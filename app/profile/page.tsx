@@ -167,6 +167,9 @@ export default function ProfilePage() {
       setOriginalData(formData);
       setMessage({ type: 'success', text: 'プロフィールを更新しました' });
       setIsEditing(false);
+      
+      // ページをリフレッシュして、ヘッダーの名前表示を更新
+      router.refresh();
     } catch (error) {
       setMessage({ 
         type: 'error', 
@@ -391,7 +394,7 @@ export default function ProfilePage() {
                   }}
                   onClick={handleAvatarClick}
                 >
-                  {!avatarUrl && (session?.user?.name ? getInitials(session.user.name) : <PersonIcon />)}
+                  {!avatarUrl && (formData.name || session?.user?.name ? getInitials(formData.name || session?.user?.name || '') : <PersonIcon />)}
                 </Avatar>
                 
                 <input
@@ -426,10 +429,10 @@ export default function ProfilePage() {
                 </Box>
 
                 <Typography variant="h6" sx={{ mt: 2 }}>
-                  {session?.user?.name}
+                  {formData.name || session?.user?.name}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {session?.user?.email}
+                  {formData.email || session?.user?.email}
                 </Typography>
               </Box>
             </Box>
