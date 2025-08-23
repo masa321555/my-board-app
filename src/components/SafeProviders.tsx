@@ -2,6 +2,8 @@
 
 import { SessionProvider } from 'next-auth/react';
 import { ReactNode, useEffect, useRef } from 'react';
+import { QueryProvider } from '@/providers/QueryProvider';
+import { SocketProvider } from '@/providers/SocketProvider';
 
 export default function SafeProviders({ children }: { children: ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -29,7 +31,11 @@ export default function SafeProviders({ children }: { children: ReactNode }) {
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
       <SessionProvider refetchInterval={0} refetchOnWindowFocus={false}>
-        {children}
+        <QueryProvider>
+          <SocketProvider>
+            {children}
+          </SocketProvider>
+        </QueryProvider>
       </SessionProvider>
     </div>
   );
