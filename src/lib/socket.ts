@@ -1,9 +1,18 @@
-import { io, Socket } from 'socket.io-client'
+import type { Socket } from 'socket.io-client'
 
 let socket: Socket | null = null
 
-export const getSocket = (): Socket => {
+// 動的インポートを使用してクライアントサイドでのみSocket.ioを初期化
+export const getSocket = async (): Promise<Socket> => {
+  // サーバーサイドでは実行しない
+  if (typeof window === 'undefined') {
+    throw new Error('Socket.io is only available on the client side')
+  }
+
   if (!socket) {
+    // 動的インポートでsocket.io-clientを読み込む
+    const { io } = await import('socket.io-client')
+    
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001'
     
     socket = io(socketUrl, {
@@ -33,8 +42,8 @@ export const getSocket = (): Socket => {
   return socket
 }
 
-export const connectSocket = (token?: string) => {
-  const socket = getSocket()
+export const connectSocket = async (token?: string): Promise<Socket> => {
+  const socket = await getSocket()
   
   if (token) {
     socket.auth = { token }
@@ -47,7 +56,11 @@ export const connectSocket = (token?: string) => {
   return socket
 }
 
-export const disconnectSocket = () => {
+export const disconnectSocket = async () => {
+  if (typeof window === 'undefined') {
+    return
+  }
+
   if (socket?.connected) {
     socket.disconnect()
   }

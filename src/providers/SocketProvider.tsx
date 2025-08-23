@@ -68,54 +68,63 @@ export function SocketProvider({ children }: SocketProviderProps) {
     // 認証済みの場合のみSocket.ioに接続
     if (status === 'authenticated' && session?.user) {
       const token = (session as any).accessToken || ''
-      const socketInstance = connectSocket(token)
       
-      setSocket(socketInstance)
+      // 非同期関数で接続を行う
+      const initSocket = async () => {
+        try {
+          const socketInstance = await connectSocket(token)
+          setSocket(socketInstance)
 
-      // 接続状態の管理
-      socketInstance.on('connect', () => {
-        setIsConnected(true)
-        console.log('Socket connected')
-        
-        // 未読通知の取得
-        socketInstance.emit('notification:getUnread')
-      })
-
-      socketInstance.on('disconnect', () => {
-        setIsConnected(false)
-        console.log('Socket disconnected')
-      })
-
-      // 通知イベントのリスナー
-      socketInstance.on('notification:new', (notification: NotificationEvent) => {
-        setNotifications((prev) => [notification, ...prev])
-        if (!notification.read) {
-          setUnreadCount((prev) => prev + 1)
-        }
-        
-        // ブラウザ通知（許可されている場合）
-        if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification('新しい通知', {
-            body: notification.message,
-            icon: '/favicon.ico',
+          // 接続状態の管理
+          socketInstance.on('connect', () => {
+            setIsConnected(true)
+            console.log('Socket connected')
+            
+            // 未読通知の取得
+            socketInstance.emit('notification:getUnread')
           })
+
+          socketInstance.on('disconnect', () => {
+            setIsConnected(false)
+            console.log('Socket disconnected')
+          })
+
+          // 通知イベントのリスナー
+          socketInstance.on('notification:new', (notification: NotificationEvent) => {
+            setNotifications((prev) => [notification, ...prev])
+            if (!notification.read) {
+              setUnreadCount((prev) => prev + 1)
+            }
+            
+            // ブラウザ通知（許可されている場合）
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('新しい通知', {
+                body: notification.message,
+                icon: '/favicon.ico',
+              })
+            }
+          })
+
+          // 未読通知の一括受信
+          socketInstance.on('notification:unread', (data: { notifications: NotificationEvent[], count: number }) => {
+            setNotifications(data.notifications)
+            setUnreadCount(data.count)
+          })
+
+          // 通知の更新
+          socketInstance.on('notification:updated', (updatedNotification: NotificationEvent) => {
+            setNotifications((prev) =>
+              prev.map((notif) =>
+                notif.id === updatedNotification.id ? updatedNotification : notif
+              )
+            )
+          })
+        } catch (error) {
+          console.error('Socket connection error:', error)
         }
-      })
+      }
 
-      // 未読通知の一括受信
-      socketInstance.on('notification:unread', (data: { notifications: NotificationEvent[], count: number }) => {
-        setNotifications(data.notifications)
-        setUnreadCount(data.count)
-      })
-
-      // 通知の更新
-      socketInstance.on('notification:updated', (updatedNotification: NotificationEvent) => {
-        setNotifications((prev) =>
-          prev.map((notif) =>
-            notif.id === updatedNotification.id ? updatedNotification : notif
-          )
-        )
-      })
+      initSocket()
 
       return () => {
         disconnectSocket()
